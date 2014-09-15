@@ -1,3 +1,11 @@
+// maybe try render
+
+var toggle = false;
+var invert = false;
+
+var WHITE = 255;
+var BLACK = 0;
+
 var whiteChance = [];
 var canvas = null;
 var ctx = null;
@@ -5,12 +13,26 @@ var ori_data = [];
 var imageData = null;
 var intervalId = null;
 var image = null;
+var color1r = BLACK;
+var color1g = BLACK;
+var color1b = BLACK;
+var color2r = WHITE;
+var color2g = WHITE;
+var color2b = WHITE;
 
-var toggle = false;
-var invert = false;
-
-var WHITE = 255;
-var BLACK = 0;
+function setColor(x) {
+	if (x == 1) { // color 1
+		var rgb = hexToRgb(document.getElementById("colorpicker1").value);
+		color1r = rgb.a;
+		color1g = rgb.g;
+		color1b = rgb.b;
+	} else { // x == 2 (color 2)
+		var rgb = hexToRgb(document.getElementById("colorpicker2").value);
+		color2r = rgb.a;
+		color2g = rgb.g;
+		color2b = rgb.b;
+	}
+}
 
 function set_image_source() {
 	var imgSource = document.getElementById("image_source_textbox").value;
@@ -33,6 +55,14 @@ function set_image_source() {
 
 function invertImage() {
 	invert = !invert;
+	
+	/*var tmp = color2;
+	color2 = color1;
+	color1 = tmp;*/
+	
+	tmp = document.getElementById("colorpicker1").value;
+	document.getElementById("colorpicker1").color.fromString(document.getElementById("colorpicker2").value);
+	document.getElementById("colorpicker2").color.fromString(tmp);
 }
 
 function drawBlackWhite() {
@@ -43,13 +73,18 @@ function drawBlackWhite() {
 		}
 	} else {
 		for (var startIdx = 0; startIdx < imageData.data.length; startIdx+=4) {
-			// Get the RGB values.
+			// random num to check against whiteChance (invert will change the result)
 			if (myXor(whiteChance[startIdx / 4] >= Math.random(), invert)) {
-				imageData.data[startIdx] = 0;
+				imageData.data[startIdx] = color1r;
+				imageData.data[startIdx+1] = color1g;
+				imageData.data[startIdx+2] = color1b;
+				//imageData.data[startIdx+3] = color1a;
 			} else {
-				imageData.data[startIdx] = 255;
+				imageData.data[startIdx] = color2r;
+				imageData.data[startIdx+1] = color2g;
+				imageData.data[startIdx+2] = color2b;
+				//imageData.data[startIdx+3] = color2a;
 			}
-			imageData.data[startIdx+2] = imageData.data[startIdx+1] = imageData.data[startIdx];
 		}
 	}
 	ctx.putImageData(imageData, 0, 0);
@@ -121,7 +156,7 @@ function putImage (imgSource) {
 		
 		console.log("img should appear2");
 		
-		intervalId = setInterval(function(){drawBlackWhite()}, 500);
+		intervalId = setInterval(function(){drawBlackWhite()}, 300);
 
 	};
 
@@ -165,6 +200,14 @@ function putImage (imgSource) {
 // HEALPER FUNCTIONS ////
 /////////////////////////
 
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
 
 function myXor (a,b) {
 	return ( a ? 1 : 0 ) ^ ( b ? 1 : 0 );
