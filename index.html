@@ -1,0 +1,26 @@
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="preety.css">
+		<title>Snow Image</title>
+	</head>
+
+	<body onload="putImage(null);" >		
+		<h2>Snow Image</h2>
+		<p>a .png file is converted to grayscale and the pixels of the file are displayed as black or white with a probabilty corresponding to the grayscale value.</p>
+		<div class="box">			
+			<h6>Image Source</h6>
+			<div>
+				<input type="text" id="image_source_textbox" size="20" />
+				<input type="button" value="Fetch Image" onclick="set_image_source()" />
+			</div>
+			<div>
+				<canvas id="canvas" width="20" height="20" style="border:solid black;" clear:left;>You'll see this if there's a problem.</canvas>
+			</div>
+			<script src="js/main.js"></script>
+			<h6>Effects</h6>
+			<a href="#" onMouseUp="invertImage()" ><p>Invert Image</p></a>
+			<!--<a href="#" onMouseUp="invertImage()" ><img name="Invert Button" src="invert_button.png" width="65" height="19" border="0" alt="javascript button"></a>-->
+			
+		</div>
+	</body>
+</html>
