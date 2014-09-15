@@ -12,7 +12,7 @@ var ctx = null;
 var ori_data = [];
 var imageData = null;
 var intervalId = null;
-var image = null;
+//var image = null;
 var color1r = BLACK;
 var color1g = BLACK;
 var color1b = BLACK;
@@ -34,20 +34,17 @@ function setColor(x) {
 	}
 }
 
-function set_image_source() {
+function set_image_source_from_url() {
 	var imgSource = document.getElementById("image_source_textbox").value;
 	if (endsIn(imgSource, ".png") || endsIn(imgSource, ".jpg") ) {
 		if (intervalId != null) {
 			clearInterval(intervalId);
 		}
-		if (image != null) {
-			//image.remove();
-			image = null;
-			ori_data = [];
-			whiteChance = [];
-		}
 		
-		putImage(imgSource);
+		ori_data = [];
+		whiteChance = [];
+		
+		putImage(imgSource, true);
 	} else {
 		alert("invalid image: " + imgSource);
 	}
@@ -91,11 +88,11 @@ function drawBlackWhite() {
 	//toggle = !toggle;
 }
 
-function putImage (imgSource) {
+function putImage (imgSource, isWeb) {
 	console.log("in putImage");
 	
 	// Create an image object.  
-	image = new Image();
+	var image = new Image();
 
 	// Can't do anything until the image loads.
 	// Hook its onload event before setting the src property.
@@ -156,7 +153,7 @@ function putImage (imgSource) {
 		
 		console.log("img should appear2");
 		
-		intervalId = setInterval(function(){drawBlackWhite()}, 300);
+		intervalId = setInterval(function(){drawBlackWhite()}, 550);
 
 	};
 
@@ -173,14 +170,34 @@ function putImage (imgSource) {
 	}
 	
 	// this line helps allow loading images
-	image.crossOrigin = ''; // no credentials flag. Same as img.crossOrigin='anonymous'
+	if (isWeb) {
+		image.crossOrigin = ''; // no credentials flag. Same as img.crossOrigin='anonymous'
+	}
 	
 	console.log("out putImage");
 }	
 
+// like set_image_source_from_url but for the load image from local file.
+document.getElementById('image_loader').onchange = function handleImage(e) {
+	var fileName = e.target.files[0].name;
+	if (endsIn(fileName, ".png") || endsIn(fileName, ".jpg")) {
+		// stop rendering
+		if (intervalId != null) {
+			clearInterval(intervalId);
+		}
 
-
-
+		ori_data = [];
+		whiteChance = [];
+		
+		var reader = new FileReader();
+		reader.onload = function (event) {
+			putImage(event.target.result, false);
+		}
+		reader.readAsDataURL(e.target.files[0]);
+	} else {
+		console.log("invalid image: " + fileName);
+	}
+}
 
 
 
@@ -230,3 +247,5 @@ function endsIn (str, toFind) {
 	
 	return true;
 }
+
+

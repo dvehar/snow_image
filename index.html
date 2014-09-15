@@ -11,10 +11,10 @@
 			<h6>Image Source</h6>
 			<div>
 				<input type="text" id="image_source_textbox" size="30" />
-				<input type="button" value="Fetch Image From URL" onclick="set_image_source()" />
+				<input type="button" value="Fetch Image From URL" onclick="set_image_source_from_url()" />
 			</div>
 			<div>
-				<input type="button" value="Fetch Image From Your Computer" onclick="set_image_source()" />
+				<input type="file" id="image_loader" value="Fetch Image From Your Computer" />
 			</div>
 			<div>
 				<canvas id="canvas" width="20" height="20" style="border:solid black;" clear:left;>You'll see this if there's a problem.</canvas>
@@ -29,7 +29,7 @@
 			<script>
 				setColor(1);
 				setColor(2);
-				putImage(null);
+				putImage(null, true);
 			</script>
 			<!--<a href="#" onMouseUp="invertImage()" ><img name="Invert Button" src="invert_button.png" width="65" height="19" border="0" alt="javascript button"></a>-->
 			
