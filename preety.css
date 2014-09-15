@@ -2,3 +2,8 @@
 .box h4 {background:#0094ff;color:white;padding:10px;}
 .box h6 {background:#0094ff;color:white;padding:10px;}
 .box p {color:#333;padding:10px;}
+
+.effect{}
+.effect:hover{
+	text-decoration:underline;
+}

@@ -23,12 +23,12 @@ var color2b = WHITE;
 function setColor(x) {
 	if (x == 1) { // color 1
 		var rgb = hexToRgb(document.getElementById("colorpicker1").value);
-		color1r = rgb.a;
+		color1r = rgb.r;
 		color1g = rgb.g;
 		color1b = rgb.b;
 	} else { // x == 2 (color 2)
 		var rgb = hexToRgb(document.getElementById("colorpicker2").value);
-		color2r = rgb.a;
+		color2r = rgb.r;
 		color2g = rgb.g;
 		color2b = rgb.b;
 	}
@@ -36,7 +36,7 @@ function setColor(x) {
 
 function set_image_source() {
 	var imgSource = document.getElementById("image_source_textbox").value;
-	if (endsIn(imgSource, ".png")) {
+	if (endsIn(imgSource, ".png") || endsIn(imgSource, ".jpg") ) {
 		if (intervalId != null) {
 			clearInterval(intervalId);
 		}
@@ -162,6 +162,7 @@ function putImage (imgSource) {
 
 	image.onerror = function () {
 		console.error("Failed to load image");
+		alert("I couldn't load the image. You can give the path to a image stored on your computer (ie /desmond/images/ball.png) or a url to an image (try to make it a https)");
 	}
 
 	// Load an image to convert.
