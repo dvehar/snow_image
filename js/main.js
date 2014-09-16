@@ -5,6 +5,8 @@ var invert = false;
 
 var WHITE = 255;
 var BLACK = 0;
+var LIGHT_GREEN_HEX = '#33CC33'
+var LIGHT_RED_HEX = '#FF1919'
 
 var whiteChance = [];
 var canvas = null;
@@ -19,6 +21,25 @@ var color1b = BLACK;
 var color2r = WHITE;
 var color2g = WHITE;
 var color2b = WHITE;
+
+var toggleProcessingButton = document.getElementById('toggleProcessingButton');
+
+function isProcessing () {
+	return (intervalId != null);
+}
+
+function toggleProcessing () {
+	if (intervalId != null) {
+		clearInterval(intervalId);
+		intervalId = null;
+		toggleProcessingButton.value = "start";
+		toggleProcessingButton.style.background = LIGHT_GREEN_HEX;
+	} else {
+		intervalId = setInterval(function(){drawBlackWhite()}, 550);
+		toggleProcessingButton.value = "stop";
+		toggleProcessingButton.style.background = LIGHT_RED_HEX;
+	}
+}
 
 function setColor(x) {
 	if (x == 1) { // color 1
@@ -39,6 +60,7 @@ function set_image_source_from_url() {
 	if (endsIn(imgSource, ".png") || endsIn(imgSource, ".jpg") ) {
 		if (intervalId != null) {
 			clearInterval(intervalId);
+			intervalId = null;
 		}
 		
 		ori_data = [];
@@ -112,7 +134,7 @@ function putImage (imgSource, isWeb) {
 		var width = image.width;
 		var height = image.height;
 
-		canvas.width = width;
+		toggleProcessingButton.style.width = canvas.width = width;
 		canvas.height = height;
 
 		// Draw the image to the canvas.
@@ -153,7 +175,9 @@ function putImage (imgSource, isWeb) {
 		
 		console.log("img should appear2");
 		
-		intervalId = setInterval(function(){drawBlackWhite()}, 550);
+		if (!isProcessing()) {
+			toggleProcessing();
+		}
 
 	};
 
@@ -247,5 +271,6 @@ function endsIn (str, toFind) {
 	
 	return true;
 }
+
 
 

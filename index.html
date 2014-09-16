@@ -17,9 +17,8 @@
 				<input type="file" id="image_loader" value="Fetch Image From Your Computer" />
 			</div>
 			<h6>Image</h6>
-			<div>
-				<canvas id="canvas" width="20" height="20" style="border:solid black;" clear:left;>You'll see this if there's a problem.</canvas>
-			</div>
+			<input type="button" value="Stop" onclick="toggleProcessing()" id="toggleProcessingButton" />
+			<div><canvas id="canvas" width="20" height="20" style="border:solid black;" clear:left;>You'll see this if there's a problem.</canvas></div>
 			Color 1: <input class="color" value="F7FF00" id="colorpicker1" onchange="setColor(1)">
 			Color 2: <input class="color" value="000000" id="colorpicker2" onchange="setColor(2)">
 			<script src="js/main.js"></script>
