@@ -3,6 +3,7 @@
 var toggle = false;
 var invert = false;
 
+var SPACE_BAR = 32;
 var WHITE = 255;
 var BLACK = 0;
 var LIGHT_GREEN_HEX = '#33CC33'
@@ -23,6 +24,33 @@ var color2g = WHITE;
 var color2b = WHITE;
 
 var toggleProcessingButton = document.getElementById('toggleProcessingButton');
+
+// if spacebar is pressed in a non-edit text senario then
+// toggleProcessing() and override the spacebar behavior
+document.addEventListener('keyup', function(event) {
+	var doPrevent = false;
+	if (event.keyCode === SPACE_BAR) {
+		var d = event.srcElement || event.target;
+		if ((d.tagName.toUpperCase() === 'INPUT' && 
+				(d.type.toUpperCase() === 'TEXT' ||
+				 d.type.toUpperCase() === 'PASSWORD' || 
+			   d.type.toUpperCase() === 'FILE' || 
+				 d.type.toUpperCase() === 'EMAIL' || 
+				 d.type.toUpperCase() === 'SEARCH' || 
+				 d.type.toUpperCase() === 'DATE' )
+			  ) || d.tagName.toUpperCase() === 'TEXTAREA')
+	 {
+			doPrevent = d.readOnly || d.disabled;
+		} else {
+			doPrevent = true;
+		}
+	}
+
+	if (doPrevent) {
+		event.preventDefault();
+		toggleProcessing();
+	}
+});
 
 function isProcessing () {
 	return (intervalId != null);
@@ -183,7 +211,7 @@ function putImage (imgSource, isWeb) {
 
 	image.onerror = function () {
 		console.error("Failed to load image");
-		alert("I couldn't load the image. You can give the path to a image stored on your computer (ie /desmond/images/ball.png) or a url to an image (try to make it a https)");
+		alert("I couldn't load the image.");
 	}
 
 	// Load an image to convert.
