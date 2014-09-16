@@ -16,15 +16,18 @@
 			<div>
 				<input type="file" id="image_loader" value="Fetch Image From Your Computer" />
 			</div>
+			<h6>Image</h6>
 			<div>
 				<canvas id="canvas" width="20" height="20" style="border:solid black;" clear:left;>You'll see this if there's a problem.</canvas>
 			</div>
+			Color 1: <input class="color" value="F7FF00" id="colorpicker1" onchange="setColor(1)">
+			Color 2: <input class="color" value="000000" id="colorpicker2" onchange="setColor(2)">
 			<script src="js/main.js"></script>
 			<script type="text/javascript" src="js/jscolor-1.4.3/jscolor.js"></script>
 			<h6>Effects</h6>
-			<a class="effect" onMouseUp="invertImage()" ><p>Invert Image</p></a>
-			Color 1: <input class="color" value="000000" id="colorpicker1" onchange="setColor(1)">
-			Color 2: <input class="color" value="ffffff" id="colorpicker2" onchange="setColor(2)">
+			<div>
+				<input type="button" value="Invert Image" onclick="invertImage()" />
+			</div>
 			
 			<script>
 				setColor(1);

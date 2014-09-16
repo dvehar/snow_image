@@ -1,7 +1,7 @@
 .box {border:2px solid #0094ff;}
-.box h4 {background:#0094ff;color:white;padding:10px;}
-.box h6 {background:#0094ff;color:white;padding:10px;}
-.box p {color:#333;padding:10px;}
+.box h4 {background:#0094ff;color:white;padding:4px;}
+.box h6 {background:#0094ff;color:white;padding:4px;}
+.box p {color:#333;padding:4px;}
 
 .effect{}
 .effect:hover{

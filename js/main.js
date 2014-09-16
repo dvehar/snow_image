@@ -164,7 +164,7 @@ function putImage (imgSource, isWeb) {
 
 	// Load an image to convert.
 	if (imgSource == null) {
-		image.src = "https://dl.dropboxusercontent.com/u/55589692/black_white/beach_mattise.png";//"three.png"; //"https://dl.dropboxusercontent.com/u/55589692/black_white/matisse_light_dnace_interlaced.png"; //"https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png"; //"a_starry_night.png"; //"Vincent_van_Gogh.png"; //"three.png";
+		image.src = "https://dl.dropboxusercontent.com/u/55589692/images/3.jpg";
 	} else {
 		image.src = imgSource;
 	}
