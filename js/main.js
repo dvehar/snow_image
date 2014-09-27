@@ -79,13 +79,13 @@ function fillHorizontial (dir) {
 		console.log("using " + dir);
 		setFillButton(dir);
 
-		if (displaySpeed != LINE_DISPLAY_SPEED || !isDrawing()) { // the drawing is called after each frame is processed rather than on an interval
+		if ((displaySpeed != LINE_DISPLAY_SPEED && isDrawing()) || (!isDrawing() && isProcessing())) { // the drawing is called after each frame is processed rather than on an interval
 			clearInterval(displayIntervalId);
 			displayIntervalId = setInterval(function(){drawFrame();}, LINE_DISPLAY_SPEED);
 		}
-		if (isProcessing() && processingSpeed != FRAME_PROCESSING_SPEED) { // if the interval is set to the incorrect speed restart it
+		if (isProcessing() && processingSpeed != LINE_PROCESSING_SPEED) { // if the interval is set to the incorrect speed restart it
 			clearInterval(processingIntervalId);
-			processingIntervalId = setInterval(function(){computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON)}, FRAME_PROCESSING_SPEED);
+			processingIntervalId = setInterval(function(){computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON)}, LINE_PROCESSING_SPEED);
 		}
 		processingSpeed = LINE_PROCESSING_SPEED;
 		displaySpeed = LINE_DISPLAY_SPEED;
@@ -126,13 +126,13 @@ function fillVertical (dir) {
 		console.log("using " + dir);
 		setFillButton(dir);
 		
-		if (displaySpeed != LINE_DISPLAY_SPEED || !isDrawing()) { // the drawing is called after each frame is processed rather than on an interval
+		if ((displaySpeed != LINE_DISPLAY_SPEED && isDrawing()) || (!isDrawing() && isProcessing())) { // the drawing is called after each frame is processed rather than on an interval
 			clearInterval(displayIntervalId);
 			displayIntervalId = setInterval(function(){drawFrame();}, LINE_DISPLAY_SPEED);
 		}
-		if (isProcessing() && processingSpeed != FRAME_PROCESSING_SPEED) { // if the interval is set to the incorrect speed restart it
+		if (isProcessing() && processingSpeed != LINE_PROCESSING_SPEED) { // if the interval is set to the incorrect speed restart it
 			clearInterval(processingIntervalId);
-			processingIntervalId = setInterval(function(){computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON)}, FRAME_PROCESSING_SPEED);
+			processingIntervalId = setInterval(function(){computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON)}, LINE_PROCESSING_SPEED);
 		}
 		processingSpeed = LINE_PROCESSING_SPEED;
 		displaySpeed = LINE_DISPLAY_SPEED;
