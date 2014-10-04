@@ -45,12 +45,18 @@ var color2r;
 var color2g;
 var color2b;
 
+var useOriColor1 = false;
+var useOriColor2 = false;
+
 var toggleProcessingButton = document.getElementById('toggleProcessingButton');
 
 var CENTER_FILL_BUTTON = document.getElementById('FrameFillButton');
 
 var selectedDirectionFillButton = null;
 var selectedDirectionFillButtonOldBorderStyle = myClone(CENTER_FILL_BUTTON.style.borderStyle);
+
+document.getElementById('originalcolorbutton1').style.width = document.getElementById('colorpicker1').offsetWidth;
+document.getElementById('originalcolorbutton2').style.width = document.getElementById('colorpicker2').offsetWidth;
 
 function setFillButton (id) {
 	// reset previous button
@@ -240,11 +246,13 @@ function setColor(x) {
 		color1r = rgb.r;
 		color1g = rgb.g;
 		color1b = rgb.b;
+		useOriColor1 = false;
 	} else { // x == 2 (color 2)
 		var rgb = hexToRgb(document.getElementById("colorpicker2").value);
 		color2r = rgb.r;
 		color2g = rgb.g;
 		color2b = rgb.b;
+		useOriColor2 = false;
 	}
 }
 
@@ -278,6 +286,10 @@ function invertImage() {
 	tmp = document.getElementById("colorpicker1").value;
 	document.getElementById("colorpicker1").color.fromString(document.getElementById("colorpicker2").value);
 	document.getElementById("colorpicker2").color.fromString(tmp);
+	
+	tmp = useOriColor1;
+	useOriColor1 = useOriColor2;
+	useOriColor2 = tmp;
 }
 /*
 function drawBlackWhite() {
@@ -320,16 +332,28 @@ function computeFrame (doDraw) {
 
 	for (var written = 0; written < pixelsPerProcessingInveral; ++written)
 	{
-		// random num to check against whiteChance (invert will change the result)
+		// random num to check against whiteChance (invert will change the result). will use the "color1" or the "color2"
 		if (myXor(whiteChance[processingIntervalBufferIdx / 4] >= Math.random(), invert)) {
-			imageData.data[processingIntervalBufferIdx] = color1r;
-			imageData.data[processingIntervalBufferIdx+1] = color1g;
-			imageData.data[processingIntervalBufferIdx+2] = color1b;
+			if (useOriColor1) { // use the original image color
+				imageData.data[processingIntervalBufferIdx] = ori_data[processingIntervalBufferIdx];
+				imageData.data[processingIntervalBufferIdx+1] = ori_data[processingIntervalBufferIdx+1];
+				imageData.data[processingIntervalBufferIdx+2] = ori_data[processingIntervalBufferIdx+2];
+			} else { // use the color from the color picker
+				imageData.data[processingIntervalBufferIdx] = color1r;
+				imageData.data[processingIntervalBufferIdx+1] = color1g;
+				imageData.data[processingIntervalBufferIdx+2] = color1b;
+			}
 			//imageData.data[processingIntervalBufferIdx+3] = color1a;
 		} else {
-			imageData.data[processingIntervalBufferIdx] = color2r;
-			imageData.data[processingIntervalBufferIdx+1] = color2g;
-			imageData.data[processingIntervalBufferIdx+2] = color2b;
+			if (useOriColor2) { // use the original image color
+				imageData.data[processingIntervalBufferIdx] = ori_data[processingIntervalBufferIdx];
+				imageData.data[processingIntervalBufferIdx+1] = ori_data[processingIntervalBufferIdx+1];
+				imageData.data[processingIntervalBufferIdx+2] = ori_data[processingIntervalBufferIdx+2];
+			} else {
+				imageData.data[processingIntervalBufferIdx] = color2r;
+				imageData.data[processingIntervalBufferIdx+1] = color2g;
+				imageData.data[processingIntervalBufferIdx+2] = color2b;
+			}
 			//imageData.data[startIdx+3] = color2a;
 		}
 		
@@ -412,11 +436,11 @@ function putImage (imgSource, isWeb) {
 				var green = pixelData[startIdx + 1];
 				var blue = pixelData[startIdx + 2];
 			}
+			pixelData[startIdx + 3] = 255; // opaque
 			ori_data.push(red);
 			ori_data.push(green);
 			ori_data.push(blue);
 			ori_data.push(255);
-			pixelData[startIdx + 3] = 255; // opaque
 		
 			// Convert to grayscale.
 			var grayScale = (red * 0.2989) + (green * 0.5870) + (blue * 0.1140);

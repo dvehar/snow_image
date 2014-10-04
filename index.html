@@ -16,11 +16,21 @@
 			<div>
 				Fetch Image From Your Computer: <input type="file" id="image_loader" />
 			</div>
+			
 			<h6>Image</h6>
 			<input type="button" value="stop" onclick="toggleProcessing()" id="toggleProcessingButton" />
 			<div><canvas id="canvas" width="20" height="20" style="border:solid black;" clear:left;>You'll see this if there's a problem.</canvas></div>
-			Color 1: <input class="color" value="000000" id="colorpicker1" onchange="setColor(1)">
-			Color 2: <input class="color" value="F7FF00" id="colorpicker2" onchange="setColor(2)">
+			<div>
+				Color 1: <input class="color" value="000000" id="colorpicker1" onchange="setColor(1)">
+				Color 2: <input class="color" value="F7FF00" id="colorpicker2" onchange="setColor(2)">
+			</div>
+
+			<div>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="button" value="Original Color" onclick="useOriColor1 = true;" id="originalcolorbutton1"/>
+			  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="button" value="Original Color" onclick="useOriColor2 = true;" id="originalcolorbutton2" />
+			</div>
 			
 			<h6>Effects</h6>
 			<div>
