@@ -53,7 +53,6 @@ var toggleProcessingButton = document.getElementById('toggleProcessingButton');
 var CENTER_FILL_BUTTON = document.getElementById('FrameFillButton');
 
 var selectedDirectionFillButton = null;
-var selectedDirectionFillButtonOldBorderStyle = myClone(CENTER_FILL_BUTTON.style.borderStyle);
 
 document.getElementById('originalcolorbutton1').style.width = document.getElementById('colorpicker1').offsetWidth;
 document.getElementById('originalcolorbutton2').style.width = document.getElementById('colorpicker2').offsetWidth;
@@ -61,13 +60,12 @@ document.getElementById('originalcolorbutton2').style.width = document.getElemen
 function setFillButton (id) {
 	// reset previous button
 	if(selectedDirectionFillButton != null) {
-		selectedDirectionFillButton.style.borderStyle = myClone(selectedDirectionFillButtonOldBorderStyle);
+		selectedDirectionFillButton.style.borderStyle = '';
 		selectedDirectionFillButton.style.borderColor = '';
 	}
 	
 	// set new button
 	selectedDirectionFillButton = document.getElementById(id);
-	selectedDirectionFillButtonOldBorderStyle = myClone(selectedDirectionFillButton.style.borderStyle);
 	selectedDirectionFillButton.style.borderStyle = 'dashed';
 	selectedDirectionFillButton.style.borderColor = '#ff0000';
 }
