@@ -240,20 +240,52 @@ function toggleProcessing () {
 	}
 }
 
+// unset the border of the colorpicker then set the border of the original color button
+function setOriginalColor(x) {
+		if (x == 1) { // color 1
+		var picker = document.getElementById("colorpicker1");
+		var colorButton = document.getElementById("originalcolorbutton1");
+		useOriColor1 = true;
+	} else { // x == 2 (color 2)
+		var picker = document.getElementById("colorpicker2");
+		var colorButton = document.getElementById("originalcolorbutton2");
+		useOriColor2 = true;
+	}
+
+	colorButton.style.borderStyle = 'dashed';
+	colorButton.style.borderColor = '#ff0000';
+	
+	picker.style.borderStyle = '';
+	picker.style.borderColor = '';
+}
+
+// set colorpicker and unset the original color
 function setColor(x) {
 	if (x == 1) { // color 1
-		var rgb = hexToRgb(document.getElementById("colorpicker1").value);
+		var picker = document.getElementById("colorpicker1");
+		var rgb = hexToRgb(picker.value);
 		color1r = rgb.r;
 		color1g = rgb.g;
 		color1b = rgb.b;
+		
 		useOriColor1 = false;
+		var colorButton = document.getElementById("originalcolorbutton1");
 	} else { // x == 2 (color 2)
-		var rgb = hexToRgb(document.getElementById("colorpicker2").value);
+		var picker = document.getElementById("colorpicker2");
+		var rgb = hexToRgb(picker.value);
 		color2r = rgb.r;
 		color2g = rgb.g;
 		color2b = rgb.b;
+		
 		useOriColor2 = false;
+		var colorButton = document.getElementById("originalcolorbutton2");
 	}
+
+	picker.style.borderStyle = 'dashed';
+	picker.style.borderColor = '#ff0000';
+	
+	colorButton.style.borderStyle = '';
+	colorButton.style.borderColor = '';
 }
 
 function set_image_source_from_url() {
