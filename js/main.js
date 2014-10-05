@@ -62,12 +62,14 @@ function setFillButton (id) {
 	// reset previous button
 	if(selectedDirectionFillButton != null) {
 		selectedDirectionFillButton.style.borderStyle = myClone(selectedDirectionFillButtonOldBorderStyle);
+		selectedDirectionFillButton.style.borderColor = '';
 	}
 	
 	// set new button
 	selectedDirectionFillButton = document.getElementById(id);
 	selectedDirectionFillButtonOldBorderStyle = myClone(selectedDirectionFillButton.style.borderStyle);
 	selectedDirectionFillButton.style.borderStyle = 'dashed';
+	selectedDirectionFillButton.style.borderColor = '#ff0000';
 }
 
 function fillDiagonal (dir) {
@@ -286,10 +288,12 @@ function invertImage() {
 	tmp = document.getElementById("colorpicker1").value;
 	document.getElementById("colorpicker1").color.fromString(document.getElementById("colorpicker2").value);
 	document.getElementById("colorpicker2").color.fromString(tmp);
-	
+
+/*	this is not nessary to do.	
 	tmp = useOriColor1;
 	useOriColor1 = useOriColor2;
 	useOriColor2 = tmp;
+*/
 }
 /*
 function drawBlackWhite() {
