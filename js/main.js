@@ -51,11 +51,16 @@ var useOriColor2 = false;
 var toggleProcessingButton = document.getElementById('toggleProcessingButton');
 
 var CENTER_FILL_BUTTON = document.getElementById('FrameFillButton');
-
 var selectedDirectionFillButton = null;
 
 document.getElementById('originalcolorbutton1').style.width = document.getElementById('colorpicker1').offsetWidth;
 document.getElementById('originalcolorbutton2').style.width = document.getElementById('colorpicker2').offsetWidth;
+
+
+var ORIGINAL_COLOR_BUTTON_1 = document.getElementById("originalcolorbutton1");
+var ORIGINAL_COLOR_BUTTON_2 = document.getElementById("originalcolorbutton2");
+var COLOR_PICKER_1 = document.getElementById("colorpicker1");
+var COLOR_PICKER_2 = document.getElementById("colorpicker2");
 
 function setFillButton (id) {
 	// reset previous button
@@ -243,12 +248,12 @@ function toggleProcessing () {
 // unset the border of the colorpicker then set the border of the original color button
 function setOriginalColor(x) {
 		if (x == 1) { // color 1
-		var picker = document.getElementById("colorpicker1");
-		var colorButton = document.getElementById("originalcolorbutton1");
+		var picker = COLOR_PICKER_1;
+		var colorButton = ORIGINAL_COLOR_BUTTON_1;
 		useOriColor1 = true;
 	} else { // x == 2 (color 2)
-		var picker = document.getElementById("colorpicker2");
-		var colorButton = document.getElementById("originalcolorbutton2");
+		var picker = COLOR_PICKER_2;
+		var colorButton = ORIGINAL_COLOR_BUTTON_2;
 		useOriColor2 = true;
 	}
 
@@ -262,23 +267,23 @@ function setOriginalColor(x) {
 // set colorpicker and unset the original color
 function setColor(x) {
 	if (x == 1) { // color 1
-		var picker = document.getElementById("colorpicker1");
+		var picker = COLOR_PICKER_1;
 		var rgb = hexToRgb(picker.value);
 		color1r = rgb.r;
 		color1g = rgb.g;
 		color1b = rgb.b;
 		
 		useOriColor1 = false;
-		var colorButton = document.getElementById("originalcolorbutton1");
+		var colorButton = ORIGINAL_COLOR_BUTTON_1;
 	} else { // x == 2 (color 2)
-		var picker = document.getElementById("colorpicker2");
+		var picker = COLOR_PICKER_2;
 		var rgb = hexToRgb(picker.value);
 		color2r = rgb.r;
 		color2g = rgb.g;
 		color2b = rgb.b;
 		
 		useOriColor2 = false;
-		var colorButton = document.getElementById("originalcolorbutton2");
+		var colorButton = ORIGINAL_COLOR_BUTTON_2;
 	}
 
 	picker.style.borderStyle = 'dashed';
@@ -315,15 +320,64 @@ function set_image_source_from_url() {
 function invertImage() {
 	invert = !invert;
 
-	tmp = document.getElementById("colorpicker1").value;
-	document.getElementById("colorpicker1").color.fromString(document.getElementById("colorpicker2").value);
-	document.getElementById("colorpicker2").color.fromString(tmp);
+	tmp = COLOR_PICKER_1.value;
+	COLOR_PICKER_1.color.fromString(COLOR_PICKER_2.value);
+	COLOR_PICKER_2.color.fromString(tmp);
 
-/*	this is not nessary to do.	
-	tmp = useOriColor1;
-	useOriColor1 = useOriColor2;
-	useOriColor2 = tmp;
-*/
+	// change the selected buttons for the colorpickers and original colors
+	// todo clean up (note the if statements are dependent such that chaning the values in the block can incorrectly effect the evaluation of the second if
+	var turnOffOriginalColorButton1 = false;
+	var turnOffOriginalColorButton2 = false;
+	var turnOffColorPicker1 = false;
+	var turnOffColorPicker2 = false;
+	
+	if (ORIGINAL_COLOR_BUTTON_1.style.borderStyle != '') {
+		turnOffOriginalColorButton1 = true;
+		turnOffOriginalColorButton2 = false;
+	} else {
+		turnOffColorPicker1 = true;
+		turnOffColorPicker2 = false;
+	}
+	
+	if (ORIGINAL_COLOR_BUTTON_2.style.borderStyle != '') {
+		turnOffOriginalColorButton1 = false;
+		turnOffOriginalColorButton2 = true;
+	} else {
+		turnOffColorPicker1 = false;
+		turnOffColorPicker2 = true;
+	}
+	
+	if (turnOffOriginalColorButton1) {
+		ORIGINAL_COLOR_BUTTON_1.style.borderStyle = '';
+		ORIGINAL_COLOR_BUTTON_1.style.borderColor = '';
+	} else {
+		ORIGINAL_COLOR_BUTTON_1.style.borderStyle = 'dashed';
+		ORIGINAL_COLOR_BUTTON_1.style.borderColor = '#ff0000';
+	}
+	
+	if (turnOffOriginalColorButton2) {
+		ORIGINAL_COLOR_BUTTON_2.style.borderStyle = '';
+		ORIGINAL_COLOR_BUTTON_2.style.borderColor = '';
+	} else {
+		ORIGINAL_COLOR_BUTTON_2.style.borderStyle = 'dashed';
+		ORIGINAL_COLOR_BUTTON_2.style.borderColor = '#ff0000';
+	}
+	
+	if (turnOffColorPicker1) {
+		COLOR_PICKER_1.style.borderStyle = '';
+		COLOR_PICKER_1.style.borderColor = '';
+	} else {
+		COLOR_PICKER_1.style.borderStyle = 'dashed';
+		COLOR_PICKER_1.style.borderColor = '#ff0000';
+	}
+	
+	if (turnOffColorPicker2) {
+		COLOR_PICKER_2.style.borderStyle = '';
+		COLOR_PICKER_2.style.borderColor = '';
+	} else {
+		COLOR_PICKER_2.style.borderStyle = 'dashed';
+		COLOR_PICKER_2.style.borderColor = '#ff0000';
+	}
 }
 /*
 function drawBlackWhite() {
