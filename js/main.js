@@ -331,52 +331,56 @@ function invertImage() {
 	var turnOffColorPicker1 = false;
 	var turnOffColorPicker2 = false;
 	
-	if (ORIGINAL_COLOR_BUTTON_1.style.borderStyle != '') {
-		turnOffOriginalColorButton1 = true;
-		turnOffOriginalColorButton2 = false;
-	} else {
-		turnOffColorPicker1 = true;
-		turnOffColorPicker2 = false;
-	}
-	
-	if (ORIGINAL_COLOR_BUTTON_2.style.borderStyle != '') {
-		turnOffOriginalColorButton1 = false;
-		turnOffOriginalColorButton2 = true;
-	} else {
-		turnOffColorPicker1 = false;
-		turnOffColorPicker2 = true;
-	}
-	
-	if (turnOffOriginalColorButton1) {
-		ORIGINAL_COLOR_BUTTON_1.style.borderStyle = '';
-		ORIGINAL_COLOR_BUTTON_1.style.borderColor = '';
-	} else {
-		ORIGINAL_COLOR_BUTTON_1.style.borderStyle = 'dashed';
-		ORIGINAL_COLOR_BUTTON_1.style.borderColor = '#ff0000';
-	}
-	
-	if (turnOffOriginalColorButton2) {
-		ORIGINAL_COLOR_BUTTON_2.style.borderStyle = '';
-		ORIGINAL_COLOR_BUTTON_2.style.borderColor = '';
-	} else {
-		ORIGINAL_COLOR_BUTTON_2.style.borderStyle = 'dashed';
-		ORIGINAL_COLOR_BUTTON_2.style.borderColor = '#ff0000';
-	}
-	
-	if (turnOffColorPicker1) {
-		COLOR_PICKER_1.style.borderStyle = '';
-		COLOR_PICKER_1.style.borderColor = '';
-	} else {
-		COLOR_PICKER_1.style.borderStyle = 'dashed';
-		COLOR_PICKER_1.style.borderColor = '#ff0000';
-	}
-	
-	if (turnOffColorPicker2) {
-		COLOR_PICKER_2.style.borderStyle = '';
-		COLOR_PICKER_2.style.borderColor = '';
-	} else {
-		COLOR_PICKER_2.style.borderStyle = 'dashed';
-		COLOR_PICKER_2.style.borderColor = '#ff0000';
+	// if both color pickers are selected then their isn't much to do
+	if (myXor(ORIGINAL_COLOR_BUTTON_1.style.borderStyle == '', ORIGINAL_COLOR_BUTTON_2.style.borderStyle == ''))
+	{
+		if (ORIGINAL_COLOR_BUTTON_1.style.borderStyle != '') {
+			turnOffOriginalColorButton1 = true;
+			turnOffOriginalColorButton2 = false;
+		} else {
+			turnOffColorPicker1 = true;
+			turnOffColorPicker2 = false;
+		}
+		
+		if (ORIGINAL_COLOR_BUTTON_2.style.borderStyle != '') {
+			turnOffOriginalColorButton1 = false;
+			turnOffOriginalColorButton2 = true;
+		} else {
+			turnOffColorPicker1 = false;
+			turnOffColorPicker2 = true;
+		}
+		
+		if (turnOffOriginalColorButton1) {
+			ORIGINAL_COLOR_BUTTON_1.style.borderStyle = '';
+			ORIGINAL_COLOR_BUTTON_1.style.borderColor = '';
+		} else {
+			ORIGINAL_COLOR_BUTTON_1.style.borderStyle = 'dashed';
+			ORIGINAL_COLOR_BUTTON_1.style.borderColor = '#ff0000';
+		}
+		
+		if (turnOffOriginalColorButton2) {
+			ORIGINAL_COLOR_BUTTON_2.style.borderStyle = '';
+			ORIGINAL_COLOR_BUTTON_2.style.borderColor = '';
+		} else {
+			ORIGINAL_COLOR_BUTTON_2.style.borderStyle = 'dashed';
+			ORIGINAL_COLOR_BUTTON_2.style.borderColor = '#ff0000';
+		}
+		
+		if (turnOffColorPicker1) {
+			COLOR_PICKER_1.style.borderStyle = '';
+			COLOR_PICKER_1.style.borderColor = '';
+		} else {
+			COLOR_PICKER_1.style.borderStyle = 'dashed';
+			COLOR_PICKER_1.style.borderColor = '#ff0000';
+		}
+		
+		if (turnOffColorPicker2) {
+			COLOR_PICKER_2.style.borderStyle = '';
+			COLOR_PICKER_2.style.borderColor = '';
+		} else {
+			COLOR_PICKER_2.style.borderStyle = 'dashed';
+			COLOR_PICKER_2.style.borderColor = '#ff0000';
+		}
 	}
 }
 /*
