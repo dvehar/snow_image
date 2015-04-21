@@ -9,28 +9,70 @@
 		<p>a .png file is converted to grayscale and the pixels of the file are displayed as black or white with a probabilty corresponding to the grayscale value.</p>
 		<div class="box">			
 			<h6>Image Source</h6>
-			<div>
-				<input type="text" id="image_source_textbox" size="30" />
-				<input type="button" value="Fetch Image From URL" onclick="set_image_source_from_url()" />
-			</div>
-			<div>
-				Fetch Image From Your Computer: <input type="file" id="image_loader" />
-			</div>
+			<table>
+			    <tr>
+			        <td>
+			            <input type="text" id="image_source_textbox" size="30" />
+			            <input type="button" value="Fetch Image From URL" onclick="set_image_source_from_url()" />
+			        </td>
+			    </tr>
+			    <tr>
+			        <td>
+			            Fetch Image From Your Computer: <input type="file" id="image_loader" />
+			        </td>
+			    </tr>
+			    <tr>
+			        <td>
+			            <!-- TODO. Use a api from Flicker, Imgur, Photobucket or something... -->
+			            <input type="button" value="Random Image" onclick="set_random_image_source()" />
+			        </td>
+			    </tr>
+			</table>
+			
 			<h6>Image</h6>
-			<input type="button" value="Stop" onclick="toggleProcessing()" id="toggleProcessingButton" />
+			<input type="button" value="stop" onclick="toggleProcessing()" id="toggleProcessingButton" />
 			<div><canvas id="canvas" width="20" height="20" style="border:solid black;" clear:left;>You'll see this if there's a problem.</canvas></div>
-			Color 1: <input class="color" value="F7FF00" id="colorpicker1" onchange="setColor(1)">
-			Color 2: <input class="color" value="000000" id="colorpicker2" onchange="setColor(2)">
-			<script src="js/main.js"></script>
-			<script type="text/javascript" src="js/jscolor-1.4.3/jscolor.js"></script>
+			<div>
+				Color 1: <input class="color" value="000000" id="colorpicker1" onchange="setColor(1)">
+				Color 2: <input class="color" value="F7FF00" id="colorpicker2" onchange="setColor(2)">
+			</div>
+
+			<div>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="button" value="Original Color" onclick="setOriginalColor(1);" id="originalcolorbutton1"/>
+			  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="button" value="Original Color" onclick="setOriginalColor(2);" id="originalcolorbutton2" />
+			</div>
+			
 			<h6>Effects</h6>
 			<div>
 				<input type="button" value="Invert Image" onclick="invertImage()" />
+				Exchanges the colors
+				<div>
+					<input type="button" value="LU" id="LeftUpFillButton" onclick="fillDiagonal('LeftUpFillButton')" />
+					<input type="button" value="UP" id="UpFillButton" onclick="fillVertical('UpFillButton')" />
+					<input type="button" value="RU" id="RightUpFillButton" onclick="fillDiagonal('RightUpFillButton')" />
+				</div>
+				<div>
+					<input type="button" value="LL" id="LeftFillButton" onclick="fillHorizontial('LeftFillButton')" />
+					<input type="button" value="CC" id="FrameFillButton" onclick="fillFrame()" />
+					<input type="button" value="RR" id="RightFillButton" onclick="fillHorizontial('RightFillButton')" />
+					Set the fill direction (Center button fills the whole image)
+				</div>
+				<div>
+					<input type="button" value="LD" id="LeftDownFillButton" onclick="fillDiagonal('LeftDownFillButton')" />
+					<input type="button" value="DD" id="DownFillButton" onclick="fillVertical('DownFillButton')" />
+					<input type="button" value="RD" id="RightDownFillButton" onclick="fillDiagonal('RightDownFillButton')" />
+				</div>
 			</div>
 			
+			<script src="js/util.js"></script>
+			<script src="js/main.js"></script>
+			<script type="text/javascript" src="js/jscolor-1.4.3/jscolor.js"></script>
 			<script>
 				setColor(1);
 				setColor(2);
+				fillFrame();
 				putImage(null, true);
 			</script>
 			<!--<a href="#" onMouseUp="invertImage()" ><img name="Invert Button" src="invert_button.png" width="65" height="19" border="0" alt="javascript button"></a>-->

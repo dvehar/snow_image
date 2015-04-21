@@ -1,4 +1,7 @@
-// maybe try render
+// TODO : finish the render directions 
+	// update vertical so it apporiately changes the display and processing speeds. Figure out how to set the vars everywhere
+		// might involve knowing what fill type is previously being applied and what fill type is going to be applied..
+	// add code for the horizontial, diagonial, ...
 
 var toggle = false;
 var invert = false;
@@ -6,24 +9,256 @@ var invert = false;
 var SPACE_BAR = 32;
 var WHITE = 255;
 var BLACK = 0;
-var LIGHT_GREEN_HEX = '#33CC33'
-var LIGHT_RED_HEX = '#FF1919'
-
+var LIGHT_GREEN_HEX = '#33CC33';
+var LIGHT_RED_HEX = '#FF1919';
+var FRAME_DISPLAY_SPEED = 300;
+var FRAME_PROCESSING_SPEED = 800;
+var LINE_DISPLAY_SPEED = 300;
+var LINE_PROCESSING_SPEED = 20;
+var MIN_PIXELS_PER_PROCESSING_INTERVAL = 734000;
+var MAX_PIXELS_PER_PROCESSING_INTERVAL = 1468000;
+var FILL_VERTICAL = 0;
+var FILL_HORIZONTIAL = 1;
+var FILL_DIAGONAL = 2;
+var FILL_FRAME = 3;
+var LOCAL_IMAGES = ["http://desmondvehar.altervista.org/files/snow/images/tree.jpg",
+                    "http://desmondvehar.altervista.org/files/snow/images/three.png",
+                    "http://desmondvehar.altervista.org/files/snow/images/mar.jpg",
+                    "http://desmondvehar.altervista.org/files/snow/images/bird.png",
+                    "http://desmondvehar.altervista.org/files/snow/images/ballon.png",
+                    "http://desmondvehar.altervista.org/files/snow/images/a_starry_night.png",
+                    "http://desmondvehar.altervista.org/files/snow/images/Vincent_van_Gogh.png"];
+                    
 var whiteChance = [];
 var canvas = null;
 var ctx = null;
 var ori_data = [];
 var imageData = null;
-var intervalId = null;
-//var image = null;
-var color1r = BLACK;
-var color1g = BLACK;
-var color1b = BLACK;
-var color2r = WHITE;
-var color2g = WHITE;
-var color2b = WHITE;
+
+var displayVsProcess = 0;
+var displayIntervalId = null;
+var displaySpeed = FRAME_DISPLAY_SPEED;
+
+var processingIntervalId = null;
+var pixelsPerProcessingInveral = 0; // will get set to quarter of the image if possible.
+var processingIntervalBufferIdx = 0;
+var processingSpeed = FRAME_PROCESSING_SPEED;
+var toDisplay=0; // the number of pixels generated but not yet written.
+
+var color1r; // the R component of the color1. set on init
+var color1g;
+var color1b;
+var color2r;
+var color2g;
+var color2b;
+
+var useOriColor1 = false;
+var useOriColor2 = false;
 
 var toggleProcessingButton = document.getElementById('toggleProcessingButton');
+
+var CENTER_FILL_BUTTON = document.getElementById('FrameFillButton');
+var selectedDirectionFillButton = null;
+
+document.getElementById('originalcolorbutton1').style.width = document.getElementById('colorpicker1').offsetWidth;
+document.getElementById('originalcolorbutton2').style.width = document.getElementById('colorpicker2').offsetWidth;
+
+
+var ORIGINAL_COLOR_BUTTON_1 = document.getElementById("originalcolorbutton1");
+var ORIGINAL_COLOR_BUTTON_2 = document.getElementById("originalcolorbutton2");
+var COLOR_PICKER_1 = document.getElementById("colorpicker1");
+var COLOR_PICKER_2 = document.getElementById("colorpicker2");
+
+function setFillButton (id) {
+	// reset previous button
+	if(selectedDirectionFillButton != null) {
+		selectedDirectionFillButton.style.borderStyle = '';
+		selectedDirectionFillButton.style.borderColor = '';
+	}
+	
+	// set new button
+	selectedDirectionFillButton = document.getElementById(id);
+	selectedDirectionFillButton.style.borderStyle = 'dashed';
+	selectedDirectionFillButton.style.borderColor = '#ff0000';
+}
+
+function get_curr_row_idx () {
+  return ((processingIntervalBufferIdx/4) % canvas.height);
+}
+
+function get_curr_col_idx () {
+  return ((processingIntervalBufferIdx/4) / canvas.height);
+}
+
+function set_processingIntervalBufferIdx (r, c) {
+  processingIntervalBufferIdx = (r + (canvas.height*c) ) * 4;
+}
+
+function fillDiagonal (dir) {
+	console.log(dir);
+	if (selectedDirectionFillButton != document.getElementById(dir)) {
+		console.log("using " + dir);
+		setFillButton(dir);
+		
+    if ((displaySpeed != LINE_DISPLAY_SPEED && isDrawing()) || (!isDrawing() && isProcessing())) { // the drawing is called after each frame is processed rather than on an interval
+			clearInterval(displayIntervalId);
+			displayIntervalId = setInterval(function(){drawFrame();}, LINE_DISPLAY_SPEED);
+		}
+		if (isProcessing() && processingSpeed != LINE_PROCESSING_SPEED) { // if the interval is set to the incorrect speed restart it
+			clearInterval(processingIntervalId);
+			processingIntervalId = setInterval(function(){computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON)}, LINE_PROCESSING_SPEED);
+		}
+		processingSpeed = LINE_PROCESSING_SPEED;
+		displaySpeed = LINE_DISPLAY_SPEED;
+		
+    
+    if (dir == 'LeftUpFillButton') {
+      updatePixelsPerProcessingInveral = function () {
+        
+      };
+    } else if (dir == 'RightUpFillButton') {
+      updatePixelsPerProcessingInveral = function () {
+      
+      };
+    } else if (dir == 'LeftDownFillButton') {
+      updatePixelsPerProcessingInveral = function () {
+      
+      };
+    } else { // 'RightDownFillButton'
+      updatePixelsPerProcessingInveral = function () {
+        pixelsPerProcessingInveral = min(canvas.width - get_curr_col_idx(), get_curr_row_idx() + 1);
+      };
+      pixelStep = 
+        function () {
+          var curr_col = get_curr_col_idx();
+          var curr_row = get_curr_row_idx();
+          if (curr_row == canvas.height-1 && curr_col == canvas.width-1) {
+            set_processingIntervalBufferIdx(0,0);
+          } else if (curr_row == 0 && curr_col < canvas.width-1) {
+            set_processingIntervalBufferIdx(curr_col+1,0);
+          } else if (curr_col == canvas.width - 1) {
+            set_processingIntervalBufferIdx(curr_col, curr_row+1);
+          } else {
+            set_processingIntervalBufferIdx(curr_row-1, curr_col+1);
+          }
+        };
+    }
+	}
+  
+  
+}
+
+function fillHorizontial (dir) {
+	console.log(dir);
+	if (selectedDirectionFillButton != document.getElementById(dir)) {
+		console.log("using " + dir);
+		setFillButton(dir);
+
+		if ((displaySpeed != LINE_DISPLAY_SPEED && isDrawing()) || (!isDrawing() && isProcessing())) { // the drawing is called after each frame is processed rather than on an interval
+			clearInterval(displayIntervalId);
+			displayIntervalId = setInterval(function(){drawFrame();}, LINE_DISPLAY_SPEED);
+		}
+		if (isProcessing() && processingSpeed != LINE_PROCESSING_SPEED) { // if the interval is set to the incorrect speed restart it
+			clearInterval(processingIntervalId);
+			processingIntervalId = setInterval(function(){computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON)}, LINE_PROCESSING_SPEED);
+		}
+		processingSpeed = LINE_PROCESSING_SPEED;
+		displaySpeed = LINE_DISPLAY_SPEED;
+		
+		pixelsPerProcessingInveral = canvas.height;	
+        updatePixelsPerProcessingInveral = function () {};
+    
+		if (dir == 'LeftFillButton') {
+			pixelStep = 
+				function () {
+					if (processingIntervalBufferIdx == 0) {
+						processingIntervalBufferIdx = imageData.data.length - 4;
+					} else {
+						var tmp = processingIntervalBufferIdx - (canvas.width*4);
+						if (tmp < 0) {
+							processingIntervalBufferIdx = processingIntervalBufferIdx + (canvas.width*4* (canvas.height-1) ) - 4;
+						} else {
+							processingIntervalBufferIdx = tmp;
+						}
+					}
+				};
+		} else { // 'RightFillButton'
+			pixelStep = function () {
+				processingIntervalBufferIdx += (canvas.width*4);
+				if (processingIntervalBufferIdx >= imageData.data.length) {
+					if (processingIntervalBufferIdx == imageData.data.length-1) { // need to go back to 0
+						processingIntervalBufferIdx = 0;
+					} else {
+						processingIntervalBufferIdx = (processingIntervalBufferIdx % imageData.data.length) + 4;
+					}
+				}
+			};
+		}
+	}
+}
+
+function fillVertical (dir) {
+	console.log(dir);
+	if (selectedDirectionFillButton != document.getElementById(dir)) {
+		console.log("using " + dir);
+		setFillButton(dir);
+		
+		if ((displaySpeed != LINE_DISPLAY_SPEED && isDrawing()) || (!isDrawing() && isProcessing())) { // the drawing is called after each frame is processed rather than on an interval
+			clearInterval(displayIntervalId);
+			displayIntervalId = setInterval(function(){drawFrame();}, LINE_DISPLAY_SPEED);
+		}
+		if (isProcessing() && processingSpeed != LINE_PROCESSING_SPEED) { // if the interval is set to the incorrect speed restart it
+			clearInterval(processingIntervalId);
+			processingIntervalId = setInterval(function(){computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON)}, LINE_PROCESSING_SPEED);
+		}
+		processingSpeed = LINE_PROCESSING_SPEED;
+		displaySpeed = LINE_DISPLAY_SPEED;
+		
+		pixelsPerProcessingInveral = canvas.width;
+    updatePixelsPerProcessingInveral = function () {};
+    
+		if (dir == 'UpFillButton') {
+			pixelStep = 
+				function () {
+					processingIntervalBufferIdx -= 4;
+					if (processingIntervalBufferIdx < 0) {
+						processingIntervalBufferIdx = imageData.data.length + processingIntervalBufferIdx;
+					}
+				};
+		} else { // 'DownFillButton'
+			pixelStep = function () { processingIntervalBufferIdx = (processingIntervalBufferIdx + 4) % imageData.data.length; };
+		}
+	}
+}
+
+function fillFrame () {
+	console.log("in fill frame");
+	if (selectedDirectionFillButton != document.getElementById('FrameFillButton')) {
+		console.log("using " + "FrameFillButton");
+		setFillButton('FrameFillButton');
+
+		if (isDrawing()) { // the drawing is called after each frame is processed rather than on an interval
+			clearInterval(displayIntervalId);
+			displayIntervalId = null;
+		}
+		if (isProcessing() && processingSpeed != FRAME_PROCESSING_SPEED) { // if the interval is set to the incorrect speed restart it
+			clearInterval(processingIntervalId);
+			processingIntervalId = setInterval(function(){computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON)}, FRAME_PROCESSING_SPEED);
+		}
+		processingSpeed = FRAME_PROCESSING_SPEED;
+		displaySpeed = FRAME_DISPLAY_SPEED;
+		
+		if (imageData != null) {
+			pixelsPerProcessingInveral = imageData.data.length / 4; // all the pixels
+		}
+		
+		pixelStep = function () {
+			processingIntervalBufferIdx = (processingIntervalBufferIdx + 4) % imageData.data.length;
+		};
+    
+    updatePixelsPerProcessingInveral = function () {};
+	}
+}
 
 // if spacebar is pressed in a non-edit text senario then
 // toggleProcessing() and override the spacebar behavior
@@ -48,47 +283,117 @@ document.addEventListener('keyup', function(event) {
 
 	if (doPrevent) {
 		event.preventDefault();
-		toggleProcessing();
+		toggleProcessing(false);
 	}
 });
 
 function isProcessing () {
-	return (intervalId != null);
+	return (processingIntervalId != null);
+}
+
+function isDrawing() {
+	return (displayIntervalId != null);
 }
 
 function toggleProcessing () {
-	if (intervalId != null) {
-		clearInterval(intervalId);
-		intervalId = null;
+	if (isProcessing()) {
+		clearInterval(processingIntervalId);
+		processingIntervalId = null;
 		toggleProcessingButton.value = "start";
 		toggleProcessingButton.style.background = LIGHT_GREEN_HEX;
 	} else {
-		intervalId = setInterval(function(){drawBlackWhite()}, 550);
+		processingIntervalId = setInterval(function(){computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON)}, processingSpeed);
 		toggleProcessingButton.value = "stop";
 		toggleProcessingButton.style.background = LIGHT_RED_HEX;
 	}
+	
+	if (isDrawing()) {
+		clearInterval(displayIntervalId);
+		displayIntervalId = null;
+	} else if (selectedDirectionFillButton != CENTER_FILL_BUTTON) { // if not drawing and the fill method is not frame fill then turn on the drawing interval
+		displayIntervalId = setInterval(function(){drawFrame();}, displaySpeed);
+	}
 }
 
+// unset the border of the colorpicker then set the border of the original color button
+function setOriginalColor(x) {
+  if (x == 1) { // color 1
+		var picker = COLOR_PICKER_1;
+		var colorButton = ORIGINAL_COLOR_BUTTON_1;
+		useOriColor1 = true;
+	} else { // x == 2 (color 2)
+		var picker = COLOR_PICKER_2;
+		var colorButton = ORIGINAL_COLOR_BUTTON_2;
+		useOriColor2 = true;
+	}
+
+	colorButton.style.borderStyle = 'dashed';
+	colorButton.style.borderColor = '#ff0000';
+	
+	picker.style.borderStyle = '';
+	picker.style.borderColor = '';
+}
+
+// set colorpicker and unset the original color
 function setColor(x) {
 	if (x == 1) { // color 1
-		var rgb = hexToRgb(document.getElementById("colorpicker1").value);
+		var picker = COLOR_PICKER_1;
+		var rgb = hexToRgb(picker.value);
 		color1r = rgb.r;
 		color1g = rgb.g;
 		color1b = rgb.b;
+		
+		useOriColor1 = false;
+		var colorButton = ORIGINAL_COLOR_BUTTON_1;
 	} else { // x == 2 (color 2)
-		var rgb = hexToRgb(document.getElementById("colorpicker2").value);
+		var picker = COLOR_PICKER_2;
+		var rgb = hexToRgb(picker.value);
 		color2r = rgb.r;
 		color2g = rgb.g;
 		color2b = rgb.b;
+		
+		useOriColor2 = false;
+		var colorButton = ORIGINAL_COLOR_BUTTON_2;
 	}
+
+	picker.style.borderStyle = 'dashed';
+	picker.style.borderColor = '#ff0000';
+	
+	colorButton.style.borderStyle = '';
+	colorButton.style.borderColor = '';
+}
+
+function set_random_image_source() {
+    var imgSource = LOCAL_IMAGES[Math.floor(Math.random()*LOCAL_IAMGES.length)];
+    // stop the processing and display intervals. start once new image is loaded.
+    // big reason to stop is because the image might fail to load
+    if (isProcessing()) {
+        clearInterval(processingIntervalId);
+        processingIntervalId = null;
+    }
+    if (isDrawing()) {
+        clearInterval(displayIntervalId);
+        displayIntervalId = null;
+    }
+    
+    ori_data = [];
+    whiteChance = [];
+    
+    putImage(imgSource, true);
 }
 
 function set_image_source_from_url() {
 	var imgSource = document.getElementById("image_source_textbox").value;
 	if (endsIn(imgSource, ".png") || endsIn(imgSource, ".jpg") ) {
-		if (intervalId != null) {
-			clearInterval(intervalId);
-			intervalId = null;
+		// stop the processing and display intervals. start once new image is loaded.
+		// big reason to stop is because the image might fail to load
+		if (isProcessing()) {
+			clearInterval(processingIntervalId);
+			processingIntervalId = null;
+		}
+		if (isDrawing()) {
+			clearInterval(displayIntervalId);
+			displayIntervalId = null;
 		}
 		
 		ori_data = [];
@@ -100,18 +405,74 @@ function set_image_source_from_url() {
 	}
 }
 
+// set the invert boolean. switch the colorpicker values
 function invertImage() {
 	invert = !invert;
-	
-	/*var tmp = color2;
-	color2 = color1;
-	color1 = tmp;*/
-	
-	tmp = document.getElementById("colorpicker1").value;
-	document.getElementById("colorpicker1").color.fromString(document.getElementById("colorpicker2").value);
-	document.getElementById("colorpicker2").color.fromString(tmp);
-}
 
+	tmp = COLOR_PICKER_1.value;
+	COLOR_PICKER_1.color.fromString(COLOR_PICKER_2.value);
+	COLOR_PICKER_2.color.fromString(tmp);
+
+	// change the selected buttons for the colorpickers and original colors
+	// todo clean up (note the if statements are dependent such that chaning the values in the block can incorrectly effect the evaluation of the second if
+	var turnOffOriginalColorButton1 = false;
+	var turnOffOriginalColorButton2 = false;
+	var turnOffColorPicker1 = false;
+	var turnOffColorPicker2 = false;
+	
+	// if both color pickers are selected then their isn't much to do
+	if (myXor(ORIGINAL_COLOR_BUTTON_1.style.borderStyle == '', ORIGINAL_COLOR_BUTTON_2.style.borderStyle == ''))
+	{
+		if (ORIGINAL_COLOR_BUTTON_1.style.borderStyle != '') {
+			turnOffOriginalColorButton1 = true;
+			turnOffOriginalColorButton2 = false;
+		} else {
+			turnOffColorPicker1 = true;
+			turnOffColorPicker2 = false;
+		}
+		
+		if (ORIGINAL_COLOR_BUTTON_2.style.borderStyle != '') {
+			turnOffOriginalColorButton1 = false;
+			turnOffOriginalColorButton2 = true;
+		} else {
+			turnOffColorPicker1 = false;
+			turnOffColorPicker2 = true;
+		}
+		
+		if (turnOffOriginalColorButton1) {
+			ORIGINAL_COLOR_BUTTON_1.style.borderStyle = '';
+			ORIGINAL_COLOR_BUTTON_1.style.borderColor = '';
+		} else {
+			ORIGINAL_COLOR_BUTTON_1.style.borderStyle = 'dashed';
+			ORIGINAL_COLOR_BUTTON_1.style.borderColor = '#ff0000';
+		}
+		
+		if (turnOffOriginalColorButton2) {
+			ORIGINAL_COLOR_BUTTON_2.style.borderStyle = '';
+			ORIGINAL_COLOR_BUTTON_2.style.borderColor = '';
+		} else {
+			ORIGINAL_COLOR_BUTTON_2.style.borderStyle = 'dashed';
+			ORIGINAL_COLOR_BUTTON_2.style.borderColor = '#ff0000';
+		}
+		
+		if (turnOffColorPicker1) {
+			COLOR_PICKER_1.style.borderStyle = '';
+			COLOR_PICKER_1.style.borderColor = '';
+		} else {
+			COLOR_PICKER_1.style.borderStyle = 'dashed';
+			COLOR_PICKER_1.style.borderColor = '#ff0000';
+		}
+		
+		if (turnOffColorPicker2) {
+			COLOR_PICKER_2.style.borderStyle = '';
+			COLOR_PICKER_2.style.borderColor = '';
+		} else {
+			COLOR_PICKER_2.style.borderStyle = 'dashed';
+			COLOR_PICKER_2.style.borderColor = '#ff0000';
+		}
+	}
+}
+/*
 function drawBlackWhite() {
 	if (toggle) { // NOTE toggle is always false
 		//imageData.data = ori_data;
@@ -137,9 +498,79 @@ function drawBlackWhite() {
 	ctx.putImageData(imageData, 0, 0);
 	//toggle = !toggle;
 }
+*/
+
+function computeFrame (doDraw) {
+	// the display is too slow (either reduce the compute speed or increase the display speed)
+	if (toDisplay > imageData.data.length * 2) {
+		console.log("speeding up display speed");
+		if (isDrawing()) { // todo maybe unnecessary
+			clearInterval(displayIntervalId);
+		}
+		displaySpeed -= 50;
+		displayIntervalId = setInterval(function(){drawFrame();}, displaySpeed);
+	}
+  
+  updatePixelsPerProcessingInveral();
+	for (var written = 0; written < pixelsPerProcessingInveral; ++written)
+	{
+		// random num to check against whiteChance (invert will change the result). will use the "color1" or the "color2"
+		if (myXor(whiteChance[processingIntervalBufferIdx / 4] >= Math.random(), invert)) {
+			if (useOriColor1) { // use the original image color
+				imageData.data[processingIntervalBufferIdx] = ori_data[processingIntervalBufferIdx];
+				imageData.data[processingIntervalBufferIdx+1] = ori_data[processingIntervalBufferIdx+1];
+				imageData.data[processingIntervalBufferIdx+2] = ori_data[processingIntervalBufferIdx+2];
+			} else { // use the color from the color picker
+				imageData.data[processingIntervalBufferIdx] = color1r;
+				imageData.data[processingIntervalBufferIdx+1] = color1g;
+				imageData.data[processingIntervalBufferIdx+2] = color1b;
+			}
+			//imageData.data[processingIntervalBufferIdx+3] = color1a;
+		} else {
+			if (useOriColor2) { // use the original image color
+				imageData.data[processingIntervalBufferIdx] = ori_data[processingIntervalBufferIdx];
+				imageData.data[processingIntervalBufferIdx+1] = ori_data[processingIntervalBufferIdx+1];
+				imageData.data[processingIntervalBufferIdx+2] = ori_data[processingIntervalBufferIdx+2];
+			} else {
+				imageData.data[processingIntervalBufferIdx] = color2r;
+				imageData.data[processingIntervalBufferIdx+1] = color2g;
+				imageData.data[processingIntervalBufferIdx+2] = color2b;
+			}
+			//imageData.data[startIdx+3] = color2a;
+		}
+		
+		pixelStep(); // update the processingIntervalBufferIdx
+	}
+	toDisplay += pixelsPerProcessingInveral;
+	
+	--displayVsProcess;	
+	
+	if(doDraw) { 
+		drawFrame();
+	}
+}
+
+function drawFrame () {
+	// speed up the processing
+	if (displayVsProcess > 2) {
+		console.log("speeding up processing speed");
+		if (isProcessing()) {
+			clearInterval(processingIntervalId);
+			processingSpeed -= 50;
+			processingIntervalId = setInterval(function(){computeFrame(false)}, processingSpeed);
+			displayVsProcess = 0;
+		}
+	}
+	
+	ctx.putImageData(imageData, 0, 0);
+	if (toDisplay < imageData.data.length) toDisplay = 0;
+	else toDisplay -= imageData.data.length;
+	
+	++displayVsProcess;
+}
 
 function putImage (imgSource, isWeb) {
-	console.log("in putImage");
+	//console.log("in putImage");
 	
 	// Create an image object.  
 	var image = new Image();
@@ -147,7 +578,6 @@ function putImage (imgSource, isWeb) {
 	// Can't do anything until the image loads.
 	// Hook its onload event before setting the src property.
 	image.onload = function () {
-		console.log("img should appear1");
 		
 		if (ctx == null) {
 			// Create a canvas
@@ -162,7 +592,8 @@ function putImage (imgSource, isWeb) {
 		var width = image.width;
 		var height = image.height;
 
-		toggleProcessingButton.style.width = canvas.width = width;
+		toggleProcessingButton.style.width = width; // make the button more obvious
+		canvas.width = width;
 		canvas.height = height;
 
 		// Draw the image to the canvas.
@@ -182,31 +613,46 @@ function putImage (imgSource, isWeb) {
 				var red = pixelData[startIdx] = WHITE;
 				var green = pixelData[startIdx + 1] = WHITE;
 				var blue = pixelData[startIdx + 2] = WHITE;
-				pixelData[startIdx + 3] = 255;
 			} else {
 				var red = pixelData[startIdx];
 				var green = pixelData[startIdx + 1];
 				var blue = pixelData[startIdx + 2];
 			}
+			pixelData[startIdx + 3] = 255; // opaque
 			ori_data.push(red);
 			ori_data.push(green);
 			ori_data.push(blue);
 			ori_data.push(255);
-			pixelData[startIdx + 3] = 255; // turn the alpha all the up so we get pure white or pure black.
 		
 			// Convert to grayscale.
 			var grayScale = (red * 0.2989) + (green * 0.5870) + (blue * 0.1140);
 			whiteChance.push((255-grayScale) / 255);
 		}
-
-		// Draw the converted image data back to the canvas.
 		
-		console.log("img should appear2");
-		
-		if (!isProcessing()) {
+		// start the processing and display intervals.
+		if (isProcessing()) {
+			alert("the processing interval should not be set"); // debugging
+		} else if (isDrawing()) {
+			alert("the display interval should not be set"); // debugging
+		} else {
+			if (selectedDirectionFillButton == CENTER_FILL_BUTTON) {
+				processingSpeed = FRAME_PROCESSING_SPEED;
+				displaySpeed = FRAME_DISPLAY_SPEED;
+				pixelsPerProcessingInveral = imageData.data.length / 4; // all the pixels
+			} else {
+				processingSpeed = LINE_PROCESSING_SPEED;
+				displaySpeed = LINE_DISPLAY_SPEED;
+				if (selectedDirectionFillButton == document.getElementById('RightFillButton') || selectedDirectionFillButton == document.getElementById('LeftFillButton') ) {
+					pixelsPerProcessingInveral = canvas.height;
+				} else if (selectedDirectionFillButton == document.getElementById('UpFillButton') || selectedDirectionFillButton == document.getElementById('DownFillButton') ) {
+					pixelsPerProcessingInveral = canvas.width;
+				} else { //} else if (selectedDirectionFillButton == document.getElementById('LeftDownFillButton') || selectedDirectionFillButton == document.getElementById('RightDownFillButton') ) {
+          // diagonal 
+          updatePixelsPerProcessingInveral();
+        }
+			}
 			toggleProcessing();
 		}
-
 	};
 
 	image.onerror = function () {
@@ -216,7 +662,7 @@ function putImage (imgSource, isWeb) {
 
 	// Load an image to convert.
 	if (imgSource == null) {
-		image.src = "https://dl.dropboxusercontent.com/u/55589692/images/3.jpg";
+		image.src = LOCAL_IMAGES[0];
 	} else {
 		image.src = imgSource;
 	}
@@ -226,16 +672,22 @@ function putImage (imgSource, isWeb) {
 		image.crossOrigin = ''; // no credentials flag. Same as img.crossOrigin='anonymous'
 	}
 	
-	console.log("out putImage");
+	//console.log("out putImage");
 }	
 
 // like set_image_source_from_url but for the load image from local file.
 document.getElementById('image_loader').onchange = function handleImage(e) {
 	var fileName = e.target.files[0].name;
 	if (endsIn(fileName, ".png") || endsIn(fileName, ".jpg")) {
-		// stop rendering
-		if (intervalId != null) {
-			clearInterval(intervalId);
+		// stop the processing and display intervals. start once new image is loaded.
+		// big reason to stop is because the image might fail to load
+		if (isProcessing()) {
+			clearInterval(processingIntervalId);
+			processingIntervalId = null;
+		}
+		if (isDrawing()) {
+			clearInterval(displayIntervalId);
+			displayIntervalId = null;
 		}
 
 		ori_data = [];
@@ -250,55 +702,3 @@ document.getElementById('image_loader').onchange = function handleImage(e) {
 		console.log("invalid image: " + fileName);
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/////////////////////////
-// HEALPER FUNCTIONS ////
-/////////////////////////
-
-function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
-}
-
-function myXor (a,b) {
-	return ( a ? 1 : 0 ) ^ ( b ? 1 : 0 );
-}
-
-function endsIn (str, toFind) {
-	if (str == null || toFind == null || str == undefined || toFind == undefined ||
-			str.length < toFind.length)
-	{
-		return false;
-	} else {
-		var startIdx = str.length - toFind.length;
-		for (var i = 0; i < toFind.length; ++i) {
-			if (str[startIdx + i] != toFind[i]) {
-				return false;
-			}
-		}
-	}
-	
-	return true;
-}
-
-
-
