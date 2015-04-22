@@ -21,13 +21,13 @@ var FILL_VERTICAL = 0;
 var FILL_HORIZONTIAL = 1;
 var FILL_DIAGONAL = 2;
 var FILL_FRAME = 3;
-var LOCAL_IMAGES = ["http://desmondvehar.altervista.org/files/snow/images/tree.jpg",
-                    "http://desmondvehar.altervista.org/files/snow/images/three.png",
-                    "http://desmondvehar.altervista.org/files/snow/images/mar.jpg",
-                    "http://desmondvehar.altervista.org/files/snow/images/bird.png",
-                    "http://desmondvehar.altervista.org/files/snow/images/ballon.png",
-                    "http://desmondvehar.altervista.org/files/snow/images/a_starry_night.png",
-                    "http://desmondvehar.altervista.org/files/snow/images/Vincent_van_Gogh.png"];
+var LOCAL_IMAGES = ["./images/tree.jpg",
+                    "./images/three.png",
+                    "./images/mar.jpg",
+                    "./images/bird.png",
+                    "./images/ballon.png",
+                    "./images/a_starry_night.png",
+                    "./images/Vincent_van_Gogh.png"];
                     
 var whiteChance = [];
 var canvas = null;
@@ -364,7 +364,7 @@ function setColor(x) {
 }
 
 function set_random_image_source() {
-    var imgSource = LOCAL_IMAGES[Math.floor(Math.random()*LOCAL_IAMGES.length)];
+    var imgSource = LOCAL_IMAGES[Math.floor(Math.random()*LOCAL_IMAGES.length)];
     // stop the processing and display intervals. start once new image is loaded.
     // big reason to stop is because the image might fail to load
     if (isProcessing()) {
@@ -647,9 +647,9 @@ function putImage (imgSource, isWeb) {
 				} else if (selectedDirectionFillButton == document.getElementById('UpFillButton') || selectedDirectionFillButton == document.getElementById('DownFillButton') ) {
 					pixelsPerProcessingInveral = canvas.width;
 				} else { //} else if (selectedDirectionFillButton == document.getElementById('LeftDownFillButton') || selectedDirectionFillButton == document.getElementById('RightDownFillButton') ) {
-          // diagonal 
-          updatePixelsPerProcessingInveral();
-        }
+                    // diagonal 
+                    updatePixelsPerProcessingInveral();
+                }
 			}
 			toggleProcessing();
 		}
