@@ -1,11 +1,3 @@
-// TODO : finish the render directions 
-	// update vertical so it apporiately changes the display and processing speeds. Figure out how to set the vars everywhere
-		// might involve knowing what fill type is previously being applied and what fill type is going to be applied..
-	// add code for the horizontial, diagonial, ...
-
-var toggle = false;
-var invert = false;
-
 var SPACE_BAR = 32;
 var WHITE = 255;
 var BLACK = 0;
@@ -28,6 +20,8 @@ var LOCAL_IMAGES = ["./images/tree.jpg",
                     "./images/ballon.png",
                     "./images/a_starry_night.png",
                     "./images/Vincent_van_Gogh.png"];
+             
+var local_image_idx = -1; // the idx into LOCAL_IMAGES if it is being used.
                     
 var whiteChance = [];
 var canvas = null;
@@ -317,21 +311,21 @@ function toggleProcessing () {
 
 // unset the border of the colorpicker then set the border of the original color button
 function setOriginalColor(x) {
-  if (x == 1) { // color 1
-		var picker = COLOR_PICKER_1;
-		var colorButton = ORIGINAL_COLOR_BUTTON_1;
-		useOriColor1 = true;
-	} else { // x == 2 (color 2)
-		var picker = COLOR_PICKER_2;
-		var colorButton = ORIGINAL_COLOR_BUTTON_2;
-		useOriColor2 = true;
-	}
+    if (x == 1) { // color 1
+        var picker = COLOR_PICKER_1;
+        var colorButton = ORIGINAL_COLOR_BUTTON_1;
+        useOriColor1 = true;
+    } else { // x == 2 (color 2)
+        var picker = COLOR_PICKER_2;
+        var colorButton = ORIGINAL_COLOR_BUTTON_2;
+        useOriColor2 = true;
+    }
 
-	colorButton.style.borderStyle = 'dashed';
-	colorButton.style.borderColor = '#ff0000';
-	
-	picker.style.borderStyle = '';
-	picker.style.borderColor = '';
+    colorButton.style.borderStyle = 'dashed';
+    colorButton.style.borderColor = '#ff0000';
+
+    picker.style.borderStyle = '';
+    picker.style.borderColor = '';
 }
 
 // set colorpicker and unset the original color
@@ -364,7 +358,13 @@ function setColor(x) {
 }
 
 function set_random_image_source() {
-    var imgSource = LOCAL_IMAGES[Math.floor(Math.random()*LOCAL_IMAGES.length)];
+    var tmp_idx = Math.floor(Math.random()*LOCAL_IMAGES.length);
+    if (tmp_idx == local_image_idx) {
+        tmp_idx = (tmp_idx + 1) % LOCAL_IMAGES.length;
+    }
+    local_image_idx = tmp_idx;
+    
+    var imgSource = LOCAL_IMAGES[local_image_idx];
     // stop the processing and display intervals. start once new image is loaded.
     // big reason to stop is because the image might fail to load
     if (isProcessing()) {
@@ -379,7 +379,7 @@ function set_random_image_source() {
     ori_data = [];
     whiteChance = [];
     
-    putImage(imgSource, true);
+    putImage(imgSource, false);
 }
 
 function set_image_source_from_url() {
@@ -405,73 +405,62 @@ function set_image_source_from_url() {
 	}
 }
 
-// set the invert boolean. switch the colorpicker values
+// a pretty simple invert: swap the values for color1 and color2
 function invertImage() {
-	invert = !invert;
-
 	tmp = COLOR_PICKER_1.value;
 	COLOR_PICKER_1.color.fromString(COLOR_PICKER_2.value);
 	COLOR_PICKER_2.color.fromString(tmp);
+	
+	tmp = color1r;
+	color1r = color2r;
+	color2r = tmp;
+
+	tmp = color1g;
+	color1g = color2g;
+	color2g = tmp;
+
+	tmp = color1b;
+	color1b = color2b;
+	color2b = tmp;
 
 	// change the selected buttons for the colorpickers and original colors
 	// todo clean up (note the if statements are dependent such that chaning the values in the block can incorrectly effect the evaluation of the second if
 	var turnOffOriginalColorButton1 = false;
-	var turnOffOriginalColorButton2 = false;
-	var turnOffColorPicker1 = false;
-	var turnOffColorPicker2 = false;
 	
 	// if both color pickers are selected then their isn't much to do
-	if (myXor(ORIGINAL_COLOR_BUTTON_1.style.borderStyle == '', ORIGINAL_COLOR_BUTTON_2.style.borderStyle == ''))
-	{
+	if (myXor(ORIGINAL_COLOR_BUTTON_1.style.borderStyle == '', ORIGINAL_COLOR_BUTTON_2.style.borderStyle == '')) {
 		if (ORIGINAL_COLOR_BUTTON_1.style.borderStyle != '') {
-			turnOffOriginalColorButton1 = true;
-			turnOffOriginalColorButton2 = false;
-		} else {
-			turnOffColorPicker1 = true;
-			turnOffColorPicker2 = false;
-		}
-		
-		if (ORIGINAL_COLOR_BUTTON_2.style.borderStyle != '') {
-			turnOffOriginalColorButton1 = false;
-			turnOffOriginalColorButton2 = true;
-		} else {
-			turnOffColorPicker1 = false;
-			turnOffColorPicker2 = true;
-		}
-		
-		if (turnOffOriginalColorButton1) {
 			ORIGINAL_COLOR_BUTTON_1.style.borderStyle = '';
 			ORIGINAL_COLOR_BUTTON_1.style.borderColor = '';
-		} else {
-			ORIGINAL_COLOR_BUTTON_1.style.borderStyle = 'dashed';
-			ORIGINAL_COLOR_BUTTON_1.style.borderColor = '#ff0000';
-		}
-		
-		if (turnOffOriginalColorButton2) {
-			ORIGINAL_COLOR_BUTTON_2.style.borderStyle = '';
-			ORIGINAL_COLOR_BUTTON_2.style.borderColor = '';
-		} else {
-			ORIGINAL_COLOR_BUTTON_2.style.borderStyle = 'dashed';
-			ORIGINAL_COLOR_BUTTON_2.style.borderColor = '#ff0000';
-		}
-		
-		if (turnOffColorPicker1) {
-			COLOR_PICKER_1.style.borderStyle = '';
-			COLOR_PICKER_1.style.borderColor = '';
-		} else {
+			useOriColor1 = false;
+			
 			COLOR_PICKER_1.style.borderStyle = 'dashed';
 			COLOR_PICKER_1.style.borderColor = '#ff0000';
-		}
-		
-		if (turnOffColorPicker2) {
+			
+			ORIGINAL_COLOR_BUTTON_2.style.borderStyle = 'dashed';
+			ORIGINAL_COLOR_BUTTON_2.style.borderColor = '#ff0000';
+			useOriColor2 = true;
+			
 			COLOR_PICKER_2.style.borderStyle = '';
 			COLOR_PICKER_2.style.borderColor = '';
 		} else {
+			ORIGINAL_COLOR_BUTTON_1.style.borderStyle = 'dashed';
+			ORIGINAL_COLOR_BUTTON_1.style.borderColor = '#ff0000';
+			useOriColor1 = true;
+			
+			COLOR_PICKER_1.style.borderStyle = '';
+			COLOR_PICKER_1.style.borderColor = '';
+			
+			ORIGINAL_COLOR_BUTTON_2.style.borderStyle = '';
+			ORIGINAL_COLOR_BUTTON_2.style.borderColor = '';
+			useOriColor2 = false;
+			
 			COLOR_PICKER_2.style.borderStyle = 'dashed';
 			COLOR_PICKER_2.style.borderColor = '#ff0000';
 		}
 	}
 }
+
 /*
 function drawBlackWhite() {
 	if (toggle) { // NOTE toggle is always false
@@ -511,32 +500,30 @@ function computeFrame (doDraw) {
 		displayIntervalId = setInterval(function(){drawFrame();}, displaySpeed);
 	}
   
-  updatePixelsPerProcessingInveral();
-	for (var written = 0; written < pixelsPerProcessingInveral; ++written)
-	{
-		// random num to check against whiteChance (invert will change the result). will use the "color1" or the "color2"
-		if (myXor(whiteChance[processingIntervalBufferIdx / 4] >= Math.random(), invert)) {
-			if (useOriColor1) { // use the original image color
-				imageData.data[processingIntervalBufferIdx] = ori_data[processingIntervalBufferIdx];
-				imageData.data[processingIntervalBufferIdx+1] = ori_data[processingIntervalBufferIdx+1];
-				imageData.data[processingIntervalBufferIdx+2] = ori_data[processingIntervalBufferIdx+2];
-			} else { // use the color from the color picker
-				imageData.data[processingIntervalBufferIdx] = color1r;
-				imageData.data[processingIntervalBufferIdx+1] = color1g;
-				imageData.data[processingIntervalBufferIdx+2] = color1b;
-			}
-			//imageData.data[processingIntervalBufferIdx+3] = color1a;
+    updatePixelsPerProcessingInveral();
+	for (var written = 0; written < pixelsPerProcessingInveral; ++written) {
+		// random num to check against whiteChance. will use the "color1" or the "color2". Will then use colorpicker or original colors.
+		use_color1 = (whiteChance[processingIntervalBufferIdx / 4] >= Math.random());
+		if (use_color1) {
+            if (useOriColor1) { // use the original image color
+                imageData.data[processingIntervalBufferIdx] = ori_data[processingIntervalBufferIdx];
+                imageData.data[processingIntervalBufferIdx+1] = ori_data[processingIntervalBufferIdx+1];
+                imageData.data[processingIntervalBufferIdx+2] = ori_data[processingIntervalBufferIdx+2];
+            } else { // use the color from the color picker
+                imageData.data[processingIntervalBufferIdx] = color1r;
+                imageData.data[processingIntervalBufferIdx+1] = color1g;
+                imageData.data[processingIntervalBufferIdx+2] = color1b;
+            }
 		} else {
-			if (useOriColor2) { // use the original image color
-				imageData.data[processingIntervalBufferIdx] = ori_data[processingIntervalBufferIdx];
-				imageData.data[processingIntervalBufferIdx+1] = ori_data[processingIntervalBufferIdx+1];
-				imageData.data[processingIntervalBufferIdx+2] = ori_data[processingIntervalBufferIdx+2];
-			} else {
-				imageData.data[processingIntervalBufferIdx] = color2r;
-				imageData.data[processingIntervalBufferIdx+1] = color2g;
-				imageData.data[processingIntervalBufferIdx+2] = color2b;
-			}
-			//imageData.data[startIdx+3] = color2a;
+            if (useOriColor2) { // use the original image color
+                imageData.data[processingIntervalBufferIdx] = ori_data[processingIntervalBufferIdx];
+                imageData.data[processingIntervalBufferIdx+1] = ori_data[processingIntervalBufferIdx+1];
+                imageData.data[processingIntervalBufferIdx+2] = ori_data[processingIntervalBufferIdx+2];
+            } else { // use the color from the color picker
+                imageData.data[processingIntervalBufferIdx] = color2r;
+                imageData.data[processingIntervalBufferIdx+1] = color2g;
+                imageData.data[processingIntervalBufferIdx+2] = color2b;
+            }
 		}
 		
 		pixelStep(); // update the processingIntervalBufferIdx
@@ -629,6 +616,10 @@ function putImage (imgSource, isWeb) {
 			whiteChance.push((255-grayScale) / 255);
 		}
 		
+		if (isWeb) {
+		    local_image_idx = -1;
+		}
+		
 		// start the processing and display intervals.
 		if (isProcessing()) {
 			alert("the processing interval should not be set"); // debugging
@@ -662,7 +653,8 @@ function putImage (imgSource, isWeb) {
 
 	// Load an image to convert.
 	if (imgSource == null) {
-		image.src = LOCAL_IMAGES[0];
+    	local_image_idx = 0;
+		image.src = LOCAL_IMAGES[local_image_idx];
 	} else {
 		image.src = imgSource;
 	}
