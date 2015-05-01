@@ -76,6 +76,10 @@ function setFillButton (id) {
 	selectedDirectionFillButton.style.borderColor = '#ff0000';
 }
 
+function get_pixel_count () {
+    return (imageData.data.length / 4);
+}
+
 function get_curr_row_idx () {
   return ((processingIntervalBufferIdx/4) % canvas.height);
 }
@@ -84,6 +88,15 @@ function get_curr_col_idx () {
   return ((processingIntervalBufferIdx/4) / canvas.height);
 }
 
+function get_row_count () {
+    return (canvas.height);
+}
+
+function get_col_count () {
+    return (canvas.width);
+}
+
+// 0,0 is the first pixel
 function set_processingIntervalBufferIdx (r, c) {
   processingIntervalBufferIdx = (r + (canvas.height*c) ) * 4;
 }
@@ -209,7 +222,7 @@ function fillVertical (dir) {
 		displaySpeed = LINE_DISPLAY_SPEED;
 		
 		pixelsPerProcessingInveral = canvas.width;
-    updatePixelsPerProcessingInveral = function () {};
+        updatePixelsPerProcessingInveral = function () {};
     
 		if (dir == 'UpFillButton') {
 			pixelStep = 
@@ -250,7 +263,36 @@ function fillFrame () {
 			processingIntervalBufferIdx = (processingIntervalBufferIdx + 4) % imageData.data.length;
 		};
     
-    updatePixelsPerProcessingInveral = function () {};
+        updatePixelsPerProcessingInveral = function () {};
+	}
+}
+
+function fillRandom () {
+    console.log("in fill random pixel");
+	if (selectedDirectionFillButton != document.getElementById('RandomPixelFillButton')) {
+		console.log("using " + "RandomPixelFillButton");
+		setFillButton('RandomPixelFillButton');
+
+		if ((displaySpeed != LINE_DISPLAY_SPEED && isDrawing()) || (!isDrawing() && isProcessing())) { // the drawing is called after each frame is processed rather than on an interval
+			clearInterval(displayIntervalId);
+			displayIntervalId = setInterval(function(){drawFrame();}, LINE_DISPLAY_SPEED);
+		}
+		if (isProcessing() && processingSpeed != LINE_PROCESSING_SPEED) { // if the interval is set to the incorrect speed restart it
+			clearInterval(processingIntervalId);
+			processingIntervalId = setInterval(function(){computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON)}, LINE_PROCESSING_SPEED);
+		}
+		processingSpeed = LINE_PROCESSING_SPEED;
+		displaySpeed = LINE_DISPLAY_SPEED;
+		
+		if (imageData != null) {
+			pixelsPerProcessingInveral = max(1,random_int(get_pixel_count() / 700));
+		}
+		
+		pixelStep = function () {
+			set_processingIntervalBufferIdx(random_int(get_row_count()-1), random_int(get_col_count()-1));
+		};
+    
+        updatePixelsPerProcessingInveral = function () {};
 	}
 }
 

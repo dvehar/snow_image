@@ -49,22 +49,36 @@
 			<div>
 				<input type="button" value="Invert Image" onclick="invertImage()" />
 				Exchanges the colors
-				<div>
-					<input type="button" value="LU" id="LeftUpFillButton" onclick="fillDiagonal('LeftUpFillButton')" />
-					<input type="button" value="UP" id="UpFillButton" onclick="fillVertical('UpFillButton')" />
-					<input type="button" value="RU" id="RightUpFillButton" onclick="fillDiagonal('RightUpFillButton')" />
-				</div>
-				<div>
-					<input type="button" value="LL" id="LeftFillButton" onclick="fillHorizontial('LeftFillButton')" />
-					<input type="button" value="CC" id="FrameFillButton" onclick="fillFrame()" />
-					<input type="button" value="RR" id="RightFillButton" onclick="fillHorizontial('RightFillButton')" />
-					Set the fill direction (Center button fills the whole image)
-				</div>
-				<div>
-					<input type="button" value="LD" id="LeftDownFillButton" onclick="fillDiagonal('LeftDownFillButton')" />
-					<input type="button" value="DD" id="DownFillButton" onclick="fillVertical('DownFillButton')" />
-					<input type="button" value="RD" id="RightDownFillButton" onclick="fillDiagonal('RightDownFillButton')" />
-				</div>
+				
+				<table>
+				    <tr>
+				        <div>
+    				        <td><input type="button" value="LU" id="LeftUpFillButton" onclick="fillDiagonal('LeftUpFillButton')" /></td>
+	    			        <td><input type="button" value="UP" id="UpFillButton" onclick="fillVertical('UpFillButton')" /></td>
+		    		        <td><input type="button" value="RU" id="RightUpFillButton" onclick="fillDiagonal('RightUpFillButton')" /></td>
+				        </div>		    		        
+				    </tr>
+				    <tr>
+				        <div>
+				            <td><input type="button" value="LL" id="LeftFillButton" onclick="fillHorizontial('LeftFillButton')" /></td>
+				            <td><input type="button" value="CC" id="FrameFillButton" onclick="fillFrame()" /></td>
+				            <td><input type="button" value="RR" id="RightFillButton" onclick="fillHorizontial('RightFillButton')" /></td>
+				            Set the fill direction (Center button fills the whole image)
+				        </div>
+				    </tr>
+				    <tr>
+				        <div>				    
+				            <td><input type="button" value="LD" id="LeftDownFillButton" onclick="fillDiagonal('LeftDownFillButton')" /></td>
+				            <td><input type="button" value="DD" id="DownFillButton" onclick="fillVertical('DownFillButton')" /></td>
+				            <td><input type="button" value="RD" id="RightDownFillButton" onclick="fillDiagonal('RightDownFillButton')" /></td>
+				        </div>				            
+				    </tr>
+				    <tr>
+				        <div>				    
+				            <input type="button" value="Random Pixels" id="RandomPixelFillButton" onclick="fillRandom()" />
+				        </div>				            
+				    </tr>
+				</table>
 			</div>
 			
 			<script src="js/util.js"></script>
@@ -82,6 +96,10 @@
 		<a href="https://github.com/dvehar/snow_image/commits/master">Changelog</a>
 		<p><u>To Do</u></p>
 		<ul>
+		    <li>Refactor code so that button fill logic is in its own file and common code is place into variables and functions</li>
+		    <li>Fix the HTML so that the fill buttons are laid out cleanly and as intended (Random Pixel should be at the bottom)</li>
+		    <li>Add a save image button</li>
+		    <li>Change the direction fill buttons to have arrows instead of text</li>
 		    <li>Add a random pixel fill mode: every frame update some pixels will randomly be choosen and updated</li>
 		    <li>Add filters which can affect the way color1 and color2 are rendered as a final step</li>
 		    <li>Implement the diagonal image fill feature</li>

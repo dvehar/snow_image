@@ -40,6 +40,11 @@ function max (a,b) {
   return ((a > b)? a:b); 
 }
 
+// return a number in [0,max_val]. assumes max is > 0.
+function random_int (max_val) {
+    return Math.floor(Math.floor(max_val+1) * Math.random());
+}
+
 function myClone(obj) {
     var copy;
 
