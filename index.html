@@ -82,13 +82,11 @@
 			</div>
 			
 			<script src="js/util.js"></script>
+			<script src="js/fill_frame.js"></script>
 			<script src="js/main.js"></script>
 			<script type="text/javascript" src="js/jscolor-1.4.3/jscolor.js"></script>
 			<script>
-				setColor(1);
-				setColor(2);
-				fillFrame();
-				putImage(null, false);
+			    main();
 			</script>
 			
 		</div>
@@ -96,7 +94,7 @@
 		<a href="https://github.com/dvehar/snow_image/commits/master">Changelog</a>
 		<p><u>To Do</u></p>
 		<ul>
-		    <li>Refactor code so that button fill logic is in its own file and common code is place into variables and functions</li>
+		    <li>Further refactor code so that button fill logic uses Object Oriented Programming</li>
 		    <li>Fix the HTML so that the fill buttons are laid out cleanly and as intended (Random Pixel should be at the bottom)</li>
 		    <li>Add a save image button</li>
 		    <li>Change the direction fill buttons to have arrows instead of text</li>

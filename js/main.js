@@ -9,10 +9,6 @@ var LINE_DISPLAY_SPEED = 300;
 var LINE_PROCESSING_SPEED = 20;
 var MIN_PIXELS_PER_PROCESSING_INTERVAL = 734000;
 var MAX_PIXELS_PER_PROCESSING_INTERVAL = 1468000;
-var FILL_VERTICAL = 0;
-var FILL_HORIZONTIAL = 1;
-var FILL_DIAGONAL = 2;
-var FILL_FRAME = 3;
 var LOCAL_IMAGES = ["./images/tree.jpg",
                     "./images/three.png",
                     "./images/mar.jpg",
@@ -51,9 +47,6 @@ var useOriColor2 = false;
 
 var toggleProcessingButton = document.getElementById('toggleProcessingButton');
 
-var CENTER_FILL_BUTTON = document.getElementById('FrameFillButton');
-var selectedDirectionFillButton = null;
-
 document.getElementById('originalcolorbutton1').style.width = document.getElementById('colorpicker1').offsetWidth;
 document.getElementById('originalcolorbutton2').style.width = document.getElementById('colorpicker2').offsetWidth;
 
@@ -63,19 +56,7 @@ var ORIGINAL_COLOR_BUTTON_2 = document.getElementById("originalcolorbutton2");
 var COLOR_PICKER_1 = document.getElementById("colorpicker1");
 var COLOR_PICKER_2 = document.getElementById("colorpicker2");
 
-function setFillButton (id) {
-	// reset previous button
-	if(selectedDirectionFillButton != null) {
-		selectedDirectionFillButton.style.borderStyle = '';
-		selectedDirectionFillButton.style.borderColor = '';
-	}
-	
-	// set new button
-	selectedDirectionFillButton = document.getElementById(id);
-	selectedDirectionFillButton.style.borderStyle = 'dashed';
-	selectedDirectionFillButton.style.borderColor = '#ff0000';
-}
-
+// imageData is flat array and every group of four indicies denotes the RGBA values for a pixel
 function get_pixel_count () {
     return (imageData.data.length / 4);
 }
@@ -99,201 +80,6 @@ function get_col_count () {
 // 0,0 is the first pixel
 function set_processingIntervalBufferIdx (r, c) {
   processingIntervalBufferIdx = (r + (canvas.height*c) ) * 4;
-}
-
-function fillDiagonal (dir) {
-	console.log(dir);
-	if (selectedDirectionFillButton != document.getElementById(dir)) {
-		console.log("using " + dir);
-		setFillButton(dir);
-		
-    if ((displaySpeed != LINE_DISPLAY_SPEED && isDrawing()) || (!isDrawing() && isProcessing())) { // the drawing is called after each frame is processed rather than on an interval
-			clearInterval(displayIntervalId);
-			displayIntervalId = setInterval(function(){drawFrame();}, LINE_DISPLAY_SPEED);
-		}
-		if (isProcessing() && processingSpeed != LINE_PROCESSING_SPEED) { // if the interval is set to the incorrect speed restart it
-			clearInterval(processingIntervalId);
-			processingIntervalId = setInterval(function(){computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON)}, LINE_PROCESSING_SPEED);
-		}
-		processingSpeed = LINE_PROCESSING_SPEED;
-		displaySpeed = LINE_DISPLAY_SPEED;
-		
-    
-    if (dir == 'LeftUpFillButton') {
-      updatePixelsPerProcessingInveral = function () {
-        
-      };
-    } else if (dir == 'RightUpFillButton') {
-      updatePixelsPerProcessingInveral = function () {
-      
-      };
-    } else if (dir == 'LeftDownFillButton') {
-      updatePixelsPerProcessingInveral = function () {
-      
-      };
-    } else { // 'RightDownFillButton'
-      updatePixelsPerProcessingInveral = function () {
-        pixelsPerProcessingInveral = min(canvas.width - get_curr_col_idx(), get_curr_row_idx() + 1);
-      };
-      pixelStep = 
-        function () {
-          var curr_col = get_curr_col_idx();
-          var curr_row = get_curr_row_idx();
-          if (curr_row == canvas.height-1 && curr_col == canvas.width-1) {
-            set_processingIntervalBufferIdx(0,0);
-          } else if (curr_row == 0 && curr_col < canvas.width-1) {
-            set_processingIntervalBufferIdx(curr_col+1,0);
-          } else if (curr_col == canvas.width - 1) {
-            set_processingIntervalBufferIdx(curr_col, curr_row+1);
-          } else {
-            set_processingIntervalBufferIdx(curr_row-1, curr_col+1);
-          }
-        };
-    }
-	}
-  
-  
-}
-
-function fillHorizontial (dir) {
-	console.log(dir);
-	if (selectedDirectionFillButton != document.getElementById(dir)) {
-		console.log("using " + dir);
-		setFillButton(dir);
-
-		if ((displaySpeed != LINE_DISPLAY_SPEED && isDrawing()) || (!isDrawing() && isProcessing())) { // the drawing is called after each frame is processed rather than on an interval
-			clearInterval(displayIntervalId);
-			displayIntervalId = setInterval(function(){drawFrame();}, LINE_DISPLAY_SPEED);
-		}
-		if (isProcessing() && processingSpeed != LINE_PROCESSING_SPEED) { // if the interval is set to the incorrect speed restart it
-			clearInterval(processingIntervalId);
-			processingIntervalId = setInterval(function(){computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON)}, LINE_PROCESSING_SPEED);
-		}
-		processingSpeed = LINE_PROCESSING_SPEED;
-		displaySpeed = LINE_DISPLAY_SPEED;
-		
-		pixelsPerProcessingInveral = canvas.height;	
-        updatePixelsPerProcessingInveral = function () {};
-    
-		if (dir == 'LeftFillButton') {
-			pixelStep = 
-				function () {
-					if (processingIntervalBufferIdx == 0) {
-						processingIntervalBufferIdx = imageData.data.length - 4;
-					} else {
-						var tmp = processingIntervalBufferIdx - (canvas.width*4);
-						if (tmp < 0) {
-							processingIntervalBufferIdx = processingIntervalBufferIdx + (canvas.width*4* (canvas.height-1) ) - 4;
-						} else {
-							processingIntervalBufferIdx = tmp;
-						}
-					}
-				};
-		} else { // 'RightFillButton'
-			pixelStep = function () {
-				processingIntervalBufferIdx += (canvas.width*4);
-				if (processingIntervalBufferIdx >= imageData.data.length) {
-					if (processingIntervalBufferIdx == imageData.data.length-1) { // need to go back to 0
-						processingIntervalBufferIdx = 0;
-					} else {
-						processingIntervalBufferIdx = (processingIntervalBufferIdx % imageData.data.length) + 4;
-					}
-				}
-			};
-		}
-	}
-}
-
-function fillVertical (dir) {
-	console.log(dir);
-	if (selectedDirectionFillButton != document.getElementById(dir)) {
-		console.log("using " + dir);
-		setFillButton(dir);
-		
-		if ((displaySpeed != LINE_DISPLAY_SPEED && isDrawing()) || (!isDrawing() && isProcessing())) { // the drawing is called after each frame is processed rather than on an interval
-			clearInterval(displayIntervalId);
-			displayIntervalId = setInterval(function(){drawFrame();}, LINE_DISPLAY_SPEED);
-		}
-		if (isProcessing() && processingSpeed != LINE_PROCESSING_SPEED) { // if the interval is set to the incorrect speed restart it
-			clearInterval(processingIntervalId);
-			processingIntervalId = setInterval(function(){computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON)}, LINE_PROCESSING_SPEED);
-		}
-		processingSpeed = LINE_PROCESSING_SPEED;
-		displaySpeed = LINE_DISPLAY_SPEED;
-		
-		pixelsPerProcessingInveral = canvas.width;
-        updatePixelsPerProcessingInveral = function () {};
-    
-		if (dir == 'UpFillButton') {
-			pixelStep = 
-				function () {
-					processingIntervalBufferIdx -= 4;
-					if (processingIntervalBufferIdx < 0) {
-						processingIntervalBufferIdx = imageData.data.length + processingIntervalBufferIdx;
-					}
-				};
-		} else { // 'DownFillButton'
-			pixelStep = function () { processingIntervalBufferIdx = (processingIntervalBufferIdx + 4) % imageData.data.length; };
-		}
-	}
-}
-
-function fillFrame () {
-	console.log("in fill frame");
-	if (selectedDirectionFillButton != document.getElementById('FrameFillButton')) {
-		console.log("using " + "FrameFillButton");
-		setFillButton('FrameFillButton');
-
-		if (isDrawing()) { // the drawing is called after each frame is processed rather than on an interval
-			clearInterval(displayIntervalId);
-			displayIntervalId = null;
-		}
-		if (isProcessing() && processingSpeed != FRAME_PROCESSING_SPEED) { // if the interval is set to the incorrect speed restart it
-			clearInterval(processingIntervalId);
-			processingIntervalId = setInterval(function(){computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON)}, FRAME_PROCESSING_SPEED);
-		}
-		processingSpeed = FRAME_PROCESSING_SPEED;
-		displaySpeed = FRAME_DISPLAY_SPEED;
-		
-		if (imageData != null) {
-			pixelsPerProcessingInveral = imageData.data.length / 4; // all the pixels
-		}
-		
-		pixelStep = function () {
-			processingIntervalBufferIdx = (processingIntervalBufferIdx + 4) % imageData.data.length;
-		};
-    
-        updatePixelsPerProcessingInveral = function () {};
-	}
-}
-
-function fillRandom () {
-    console.log("in fill random pixel");
-	if (selectedDirectionFillButton != document.getElementById('RandomPixelFillButton')) {
-		console.log("using " + "RandomPixelFillButton");
-		setFillButton('RandomPixelFillButton');
-
-		if ((displaySpeed != LINE_DISPLAY_SPEED && isDrawing()) || (!isDrawing() && isProcessing())) { // the drawing is called after each frame is processed rather than on an interval
-			clearInterval(displayIntervalId);
-			displayIntervalId = setInterval(function(){drawFrame();}, LINE_DISPLAY_SPEED);
-		}
-		if (isProcessing() && processingSpeed != LINE_PROCESSING_SPEED) { // if the interval is set to the incorrect speed restart it
-			clearInterval(processingIntervalId);
-			processingIntervalId = setInterval(function(){computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON)}, LINE_PROCESSING_SPEED);
-		}
-		processingSpeed = LINE_PROCESSING_SPEED;
-		displaySpeed = LINE_DISPLAY_SPEED;
-		
-		if (imageData != null) {
-			pixelsPerProcessingInveral = max(1,random_int(get_pixel_count() / 700));
-		}
-		
-		pixelStep = function () {
-			set_processingIntervalBufferIdx(random_int(get_row_count()-1), random_int(get_col_count()-1));
-		};
-    
-        updatePixelsPerProcessingInveral = function () {};
-	}
 }
 
 // if spacebar is pressed in a non-edit text senario then
@@ -735,4 +521,11 @@ document.getElementById('image_loader').onchange = function handleImage(e) {
 	} else {
 		console.log("invalid image: " + fileName);
 	}
+}
+
+function main () {
+    setColor(1);
+    setColor(2);
+    fillFrame();
+    putImage(null, false);
 }
