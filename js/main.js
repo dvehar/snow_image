@@ -212,7 +212,7 @@ function set_random_image_source() {
 
 function set_image_source_from_url() {
 	var imgSource = document.getElementById("image_source_textbox").value;
-	if (endsIn(imgSource, ".png") || endsIn(imgSource, ".jpg") ) {
+	if (imgSource.endsWith('.png') || imgSource.endsWith('.jpg') ) {
 		// stop the processing and display intervals. start once new image is loaded.
 		// big reason to stop is because the image might fail to load
 		if (isProcessing()) {
@@ -498,7 +498,7 @@ function putImage (imgSource, isWeb) {
 // like set_image_source_from_url but for the load image from local file.
 document.getElementById('image_loader').onchange = function handleImage(e) {
 	var fileName = e.target.files[0].name;
-	if (endsIn(fileName, ".png") || endsIn(fileName, ".jpg")) {
+	if (fileName.endsWith('.png') || fileName.endsWith('.jpg') ) {
 		// stop the processing and display intervals. start once new image is loaded.
 		// big reason to stop is because the image might fail to load
 		if (isProcessing()) {

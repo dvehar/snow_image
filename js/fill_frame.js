@@ -62,7 +62,7 @@ function fillDiagonal (dir) {
           };
         } else { // 'RightDownFillButton'
           updatePixelsPerProcessingInveral = function () {
-            pixelsPerProcessingInveral = min(canvas.width - get_curr_col_idx(), get_curr_row_idx() + 1);
+            pixelsPerProcessingInveral = Math.min(canvas.width - get_curr_col_idx(), get_curr_row_idx() + 1);
           };
           pixelStep = 
             function () {
@@ -184,7 +184,7 @@ function fillRandom () {
 		updatePixelsPerProcessingInveral = DO_NOTHING;
 		
 		if (imageData != null) {
-			pixelsPerProcessingInveral = max(1,random_int(get_pixel_count() / 700));
+			pixelsPerProcessingInveral = Math.max(1,random_int(get_pixel_count() / 700));
 		}
 		
 		pixelStep = function () {
