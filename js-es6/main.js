@@ -1,6 +1,4 @@
-import $ from 'jquery';
-import { hexToRgb, myXor, randomInt } from './util';
-import { fillFrame, fillHorizontial, fillDiagonal, fillRandom } from './fill_frame';
+import { DO_NOTHING, hexToRgb, myXor, randomInt } from './util';
 import Jscolor from './jscolor-1.4.3/jscolor';
 
 const SPACE_BAR = 32;
@@ -37,7 +35,7 @@ let displayIntervalId = null;
 let displaySpeed = FRAME_DISPLAY_SPEED;
 
 let processingIntervalId = null;
-let pixelsPerProcessingInveral = 0; // will get set to quarter of the image if possible.
+let pixelsPerProcessingInterval = 0; // will get set to quarter of the image if possible.
 let processingIntervalBufferIdx = 0;
 let processingSpeed = FRAME_PROCESSING_SPEED;
 let toDisplay = 0; // the number of pixels generated but not yet written.
@@ -52,15 +50,18 @@ let color2b;
 let useOriColor1 = false;
 let useOriColor2 = false;
 
-let toggleProcessingButton = $('#toggleProcessingButton');
+let toggleProcessingButton = $('#toggleProcessingButton')[0];
 
-$('#originalcolorbutton1').style.width = $('#colorpicker1').offsetWidth;
-$('#originalcolorbutton2').style.width = $('#colorpicker2').offsetWidth;
+$('#originalcolorbutton1')[0].style.width = $('#colorpicker1')[0].offsetWidth;
+$('#originalcolorbutton2')[0].style.width = $('#colorpicker2')[0].offsetWidth;
 
-let ORIGINAL_COLOR_BUTTON_1 = $('#originalcolorbutton1');
-let ORIGINAL_COLOR_BUTTON_2 = $('#originalcolorbutton2');
-let COLOR_PICKER_1 = $('#colorpicker1');
-let COLOR_PICKER_2 = $('#colorpicker2');
+let ORIGINAL_COLOR_BUTTON_1 = $('#originalcolorbutton1')[0];
+let ORIGINAL_COLOR_BUTTON_2 = $('#originalcolorbutton2')[0];
+let COLOR_PICKER_1 = $('#colorpicker1')[0];
+let COLOR_PICKER_2 = $('#colorpicker2')[0];
+
+let pixelStep = null; // a function that determines which pixel to render next
+let updatePixelsPerProcessingInterval = null; // a function that determines the number of pixels to render per processing interveral
 
 // imageData is flat array and every group of four indicies denotes the RGBA values for a pixel
 function get_pixel_count() {
@@ -163,26 +164,29 @@ function setOriginalColor(x) {
 
 // set colorpicker and unset the original color
 function setColor(x) {
+	let picker;
+	let rgb;
+	let colorButton;
 	if (x == 1) {
 		// color 1
-		let picker = COLOR_PICKER_1;
-		let rgb = hexToRgb(picker.value);
+		picker = COLOR_PICKER_1;
+		rgb = hexToRgb(picker.value);
 		color1r = rgb.r;
 		color1g = rgb.g;
 		color1b = rgb.b;
 
 		useOriColor1 = false;
-		let colorButton = ORIGINAL_COLOR_BUTTON_1;
+		colorButton = ORIGINAL_COLOR_BUTTON_1;
 	} else {
 		// x == 2 (color 2)
-		let picker = COLOR_PICKER_2;
-		let rgb = hexToRgb(picker.value);
+		picker = COLOR_PICKER_2;
+		rgb = hexToRgb(picker.value);
 		color2r = rgb.r;
 		color2g = rgb.g;
 		color2b = rgb.b;
 
 		useOriColor2 = false;
-		let colorButton = ORIGINAL_COLOR_BUTTON_2;
+		colorButton = ORIGINAL_COLOR_BUTTON_2;
 	}
 
 	picker.style.borderStyle = 'dashed';
@@ -218,7 +222,7 @@ function set_random_image_source() {
 }
 
 function set_image_source_from_url() {
-	let imgSource = $('#image_source_textbox').value;
+	let imgSource = $('#image_source_textbox')[0].value;
 	if (imgSource.endsWith('.png') || imgSource.endsWith('.jpg')) {
 		// stop the processing and display intervals. start once new image is loaded.
 		// big reason to stop is because the image might fail to load
@@ -338,8 +342,8 @@ function computeFrame(doDraw) {
 		}, displaySpeed);
 	}
 
-	updatePixelsPerProcessingInveral();
-	for (let written = 0; written < pixelsPerProcessingInveral; ++written) {
+	updatePixelsPerProcessingInterval();
+	for (let written = 0; written < pixelsPerProcessingInterval; ++written) {
 		// random num to check against whiteChance. will use the 'color1' or the 'color2'. Will then use colorpicker or original colors.
 		use_color1 = whiteChance[processingIntervalBufferIdx / 4] >= Math.random();
 		if (use_color1) {
@@ -370,7 +374,7 @@ function computeFrame(doDraw) {
 
 		pixelStep(); // update the processingIntervalBufferIdx
 	}
-	toDisplay += pixelsPerProcessingInveral;
+	toDisplay += pixelsPerProcessingInterval;
 
 	--displayVsProcess;
 
@@ -411,7 +415,7 @@ function putImage(imgSource, isWeb) {
 
 		if (ctx == null) {
 			// Create a canvas
-			canvas = $('#canvas');
+			canvas = $('#canvas')[0];
 
 			// Get the drawing context.
 			ctx = canvas.getContext('2d');
@@ -475,18 +479,18 @@ function putImage(imgSource, isWeb) {
 					if (selectedDirectionFillButton == CENTER_FILL_BUTTON) {
 						processingSpeed = FRAME_PROCESSING_SPEED;
 						displaySpeed = FRAME_DISPLAY_SPEED;
-						pixelsPerProcessingInveral = imageData.data.length / 4; // all the pixels
+						pixelsPerProcessingInterval = imageData.data.length / 4; // all the pixels
 					} else {
 							processingSpeed = LINE_PROCESSING_SPEED;
 							displaySpeed = LINE_DISPLAY_SPEED;
-							if (selectedDirectionFillButton == $('#RightFillButton') || selectedDirectionFillButton == $('#LeftFillButton')) {
-								pixelsPerProcessingInveral = canvas.height;
-							} else if (selectedDirectionFillButton == $('#UpFillButton') || selectedDirectionFillButton == $('#DownFillButton')) {
-								pixelsPerProcessingInveral = canvas.width;
+							if (selectedDirectionFillButton == $('#RightFillButton')[0] || selectedDirectionFillButton == $('#LeftFillButton')[0]) {
+								pixelsPerProcessingInterval = canvas.height;
+							} else if (selectedDirectionFillButton == $('#UpFillButton')[0] || selectedDirectionFillButton == $('#DownFillButton')[0]) {
+								pixelsPerProcessingInterval = canvas.width;
 							} else {
 								//} else if (selectedDirectionFillButton == $('#LeftDownFillButton') || selectedDirectionFillButton == $('#RightDownFillButton') ) {
 								// diagonal
-								updatePixelsPerProcessingInveral();
+								updatePixelsPerProcessingInterval();
 							}
 						}
 					toggleProcessing();
@@ -514,8 +518,206 @@ function putImage(imgSource, isWeb) {
 	//console.log('out putImage');
 }
 
+var CENTER_FILL_BUTTON = document.getElementById('FrameFillButton');
+var selectedDirectionFillButton = null;
+
+function _setFillButton(id) {
+	// reset previous button
+	if (selectedDirectionFillButton != null) {
+		selectedDirectionFillButton.style.borderStyle = '';
+		selectedDirectionFillButton.style.borderColor = '';
+	}
+
+	// set new button
+	selectedDirectionFillButton = document.getElementById(id);
+	selectedDirectionFillButton.style.borderStyle = 'dashed';
+	selectedDirectionFillButton.style.borderColor = '#ff0000';
+}
+
+// used by up, down, right, and left
+// it is also currently used by random pixel
+function _commonButtonChangingLogic() {
+	// if the drawing speed doesn't match the initial speed for the line filling functions
+	// or the drawing interval is not yet set
+	// then reset the drawing interval
+	if (displaySpeed != LINE_DISPLAY_SPEED && isDrawing() || !isDrawing() && isProcessing()) {
+		clearInterval(displayIntervalId);
+		displayIntervalId = setInterval(function () {
+			drawFrame();
+		}, LINE_DISPLAY_SPEED);
+	}
+
+	// if the processing interval speed is not the default for the line filling functions reset it
+	if (isProcessing() && processingSpeed != LINE_PROCESSING_SPEED) {
+		clearInterval(processingIntervalId);
+		processingIntervalId = setInterval(function () {
+			computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON);
+		}, LINE_PROCESSING_SPEED);
+	}
+	processingSpeed = LINE_PROCESSING_SPEED;
+	displaySpeed = LINE_DISPLAY_SPEED;
+}
+
+function fillDiagonal(dir) {
+	console.log(dir);
+	if (selectedDirectionFillButton != document.getElementById(dir)) {
+		console.log(`using ${ dir }`);
+		_setFillButton(dir);
+		_commonButtonChangingLogic();
+
+		if (dir == 'LeftUpFillButton') {
+			updatePixelsPerProcessingInterval = function () {};
+		} else if (dir == 'RightUpFillButton') {
+			updatePixelsPerProcessingInterval = function () {};
+		} else if (dir == 'LeftDownFillButton') {
+			updatePixelsPerProcessingInterval = function () {};
+		} else {
+			// 'RightDownFillButton'
+			updatePixelsPerProcessingInterval = function () {
+				pixelsPerProcessingInterval = Math.min(canvas.width - get_curr_col_idx(), get_curr_row_idx() + 1);
+			};
+			pixelStep = function () {
+				var curr_col = get_curr_col_idx();
+				var curr_row = get_curr_row_idx();
+				if (curr_row == canvas.height - 1 && curr_col == canvas.width - 1) {
+					set_processingIntervalBufferIdx(0, 0);
+				} else if (curr_row == 0 && curr_col < canvas.width - 1) {
+					set_processingIntervalBufferIdx(curr_col + 1, 0);
+				} else if (curr_col == canvas.width - 1) {
+					set_processingIntervalBufferIdx(curr_col, curr_row + 1);
+				} else {
+					set_processingIntervalBufferIdx(curr_row - 1, curr_col + 1);
+				}
+			};
+		}
+	}
+}
+
+function fillHorizontial(dir) {
+	console.log(dir);
+	if (selectedDirectionFillButton != document.getElementById(dir)) {
+		console.log("using " + dir);
+		_setFillButton(dir);
+		_commonButtonChangingLogic();
+		pixelsPerProcessingInterval = canvas.height;
+		updatePixelsPerProcessingInterval = DO_NOTHING;
+
+		if (dir == 'LeftFillButton') {
+			pixelStep = function () {
+				if (processingIntervalBufferIdx == 0) {
+					processingIntervalBufferIdx = imageData.data.length - 4;
+				} else {
+					var tmp = processingIntervalBufferIdx - canvas.width * 4;
+					if (tmp < 0) {
+						processingIntervalBufferIdx = processingIntervalBufferIdx + canvas.width * 4 * (canvas.height - 1) - 4;
+					} else {
+						processingIntervalBufferIdx = tmp;
+					}
+				}
+			};
+		} else {
+			// 'RightFillButton'
+			pixelStep = function () {
+				processingIntervalBufferIdx += canvas.width * 4;
+				if (processingIntervalBufferIdx >= imageData.data.length) {
+					if (processingIntervalBufferIdx == imageData.data.length - 1) {
+						// need to go back to 0
+						processingIntervalBufferIdx = 0;
+					} else {
+						processingIntervalBufferIdx = processingIntervalBufferIdx % imageData.data.length + 4;
+					}
+				}
+			};
+		}
+	}
+}
+
+function fillVertical(dir) {
+	console.log(dir);
+	if (selectedDirectionFillButton != document.getElementById(dir)) {
+		console.log("using " + dir);
+		_setFillButton(dir);
+		_commonButtonChangingLogic();
+		pixelsPerProcessingInterval = canvas.width;
+		updatePixelsPerProcessingInterval = DO_NOTHING;
+
+		if (dir == 'UpFillButton') {
+			pixelStep = function () {
+				processingIntervalBufferIdx -= 4;
+				if (processingIntervalBufferIdx < 0) {
+					processingIntervalBufferIdx = imageData.data.length + processingIntervalBufferIdx;
+				}
+			};
+		} else {
+			// 'DownFillButton'
+			pixelStep = function () {
+				processingIntervalBufferIdx = (processingIntervalBufferIdx + 4) % imageData.data.length;
+			};
+		}
+	}
+}
+
+function fillFrame() {
+	console.log("in fill frame");
+	if (selectedDirectionFillButton != document.getElementById('FrameFillButton')) {
+		console.log("using " + "FrameFillButton");
+		_setFillButton('FrameFillButton');
+
+		if (isDrawing()) {
+			// the drawing is called after each frame is processed rather than on an interval
+			clearInterval(displayIntervalId);
+			displayIntervalId = null;
+		}
+		if (isProcessing() && processingSpeed != FRAME_PROCESSING_SPEED) {
+			// if the interval is set to the incorrect speed restart it
+			clearInterval(processingIntervalId);
+			processingIntervalId = setInterval(function () {
+				computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON);
+			}, FRAME_PROCESSING_SPEED);
+		}
+		processingSpeed = FRAME_PROCESSING_SPEED;
+		displaySpeed = FRAME_DISPLAY_SPEED;
+
+		if (imageData != null) {
+			pixelsPerProcessingInterval = get_pixel_count();
+		}
+
+		pixelStep = function () {
+			processingIntervalBufferIdx = (processingIntervalBufferIdx + 4) % imageData.data.length;
+		};
+
+		updatePixelsPerProcessingInterval = DO_NOTHING;
+	}
+}
+
+function fillRandom() {
+	console.log("in fill random pixel");
+	if (selectedDirectionFillButton != document.getElementById('RandomPixelFillButton')) {
+		console.log("using " + "RandomPixelFillButton");
+		_setFillButton('RandomPixelFillButton');
+		_commonButtonChangingLogic();
+		updatePixelsPerProcessingInterval = DO_NOTHING;
+
+		if (imageData != null) {
+			pixelsPerProcessingInterval = Math.max(1, randomInt(get_pixel_count() / 700));
+		}
+
+		pixelStep = function () {
+			set_processingIntervalBufferIdx(randomInt(get_row_count() - 1), randomInt(get_col_count() - 1));
+		};
+	}
+}
+
+
+
+
+
+
+
+
+
 // like set_image_source_from_url but for the load image from local file.
-$('#image_loader').onchange = e => {
+$('#image_loader')[0].onchange = e => {
 	let fileName = e.target.files[0].name;
 	if (fileName.endsWith('.png') || fileName.endsWith('.jpg')) {
 		// stop the processing and display intervals. start once new image is loaded.
@@ -543,64 +745,64 @@ $('#image_loader').onchange = e => {
 };
 
 $(document).ready(() => {
-	$(`#fetchImageFromURLButton`).click(() => {
+	$('#fetchImageFromURLButton').click(() => {
 		set_image_source_from_url();
 	});
-	$(`#FetchRandomImage`).click(() => {
+	$('#FetchRandomImage').click(() => {
 		set_random_image_source();
 	});
 
-	$(`#toggleProcessingButton`).click(() => {
+	$('#toggleProcessingButton').click(() => {
 		toggleProcessing();
 	});
 
-	$(`#colorpicker1`).change(() => {
+	$('#colorpicker1').change(() => {
 		setColor(1);
 	});
-	$(`#colorpicker2`).change(() => {
+	$('#colorpicker2').change(() => {
 		setColor(2);
 	});
 
-	$(`#invertImageButton`).click(() => {
+	$('#invertImageButton').click(() => {
 		invertImage();
 	});
 
-	$(`#originalcolorbutton1`).click(() => {
+	$('#originalcolorbutton1').click(() => {
 		setOriginalColor(1);
 	});
-	$(`#originalcolorbutton2`).click(() => {
+	$('#originalcolorbutton2').click(() => {
 		setOriginalColor(2);
 	});
 
-	$(`#LeftUpFillButton`).click(() => {
+	$('#LeftUpFillButton').click(() => {
 		fillDiagonal('LeftUpFillButton');
 	});
-	$(`#UpFillButton`).click(() => {
+	$('#UpFillButton').click(() => {
 		fillVertical('UpFillButton');
 	});
-	$(`#RightUpFillButton`).click(() => {
+	$('#RightUpFillButton').click(() => {
 		fillDiagonal('RightUpFillButton');
 	});
-	$(`#LeftFillButton`).click(() => {
+	$('#LeftFillButton').click(() => {
 		fillHorizontial('LeftFillButton');
 	});
-	$(`#FrameFillButton`).click(() => {
+	$('#FrameFillButton').click(() => {
 		fillFrame('FrameFillButton');
 	});
-	$(`#RightFillButton`).click(() => {
+	$('#RightFillButton').click(() => {
 		fillHorizontial('RightFillButton');
 	});
-	$(`#LeftDownFillButton`).click(() => {
+	$('#LeftDownFillButton').click(() => {
 		fillDiagonal('LeftDownFillButton');
 	});
-	$(`#DownFillButton`).click(() => {
+	$('#DownFillButton').click(() => {
 		fillVertical('DownFillButton');
 	});
-	$(`#RightDownFillButton`).click(() => {
+	$('#RightDownFillButton').click(() => {
 		fillDiagonal('RightDownFillButton');
 	});
 
-	$(`#RandomPixelFillButton`).click(() => {
+	$('#RandomPixelFillButton').click(() => {
 		fillRandom();
 	});
 	
