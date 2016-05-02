@@ -249,6 +249,7 @@ function set_image_source_from_url() {
 // a pretty simple invert: swap the values for color1 and color2
 function invertImage() {
 	let tmp = COLOR_PICKER_1.value;
+
 	COLOR_PICKER_1.color.fromString(COLOR_PICKER_2.value);
 	COLOR_PICKER_2.color.fromString(tmp);
 
