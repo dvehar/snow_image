@@ -248,7 +248,7 @@ function set_image_source_from_url() {
 
 // a pretty simple invert: swap the values for color1 and color2
 function invertImage() {
-	tmp = COLOR_PICKER_1.value;
+	let tmp = COLOR_PICKER_1.value;
 	COLOR_PICKER_1.color.fromString(COLOR_PICKER_2.value);
 	COLOR_PICKER_2.color.fromString(tmp);
 
@@ -449,13 +449,13 @@ function putImage(imgSource, isWeb) {
 			let blue;
 			let alpha = pixelData[startIdx + 3];
 			if (alpha === 0) {
-				pixelData[startIdx] = WHITE;
-				pixelData[startIdx + 1] = WHITE;
-				pixelData[startIdx + 2] = WHITE;
+				red = pixelData[startIdx] = WHITE;
+				green = pixelData[startIdx + 1] = WHITE;
+				blue = pixelData[startIdx + 2] = WHITE;
 			} else {
-				pixelData[startIdx];
-				pixelData[startIdx + 1];
-				pixelData[startIdx + 2];
+				red = pixelData[startIdx];
+				green = pixelData[startIdx + 1];
+				blue = pixelData[startIdx + 2];
 			}
 			pixelData[startIdx + 3] = 255; // opaque
 			ori_data.push(red);

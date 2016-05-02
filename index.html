@@ -4,11 +4,11 @@
 		<title>Snow Image</title>
 	</head>
 
-	<body>		
+	<body>
 		<h2>Snow Image</h2>
 		<p>An image, .png or .jpeg, is converted to grayscale and then each pixel's value is used to probabilistically determine whether the pixel will take on 'color 1' or 'color 2'. These two colors can be be any two colors or take on the original pixel values. The image can be render in its entirety (this is the default behavior) or a few lines at a time in a specified direction. You can upload an image from your computer, specify an image's URL (this might not always work due to your web brower's security features), or use a random image that I have stored on the page.</p>
 		<p>I created this project to do something a little more artsy as well as to get some more experince mainipulating and rendering images. A future project I will work on will be stiching together random photos to form a tiled image that resembles the image given by the user. This project uses (or will use) the following technologies: HTML5 (canvas), jQuery, JavaScript, CSS, REST APIs, Git, and more!</p>
-		<div class="box">			
+		<div class="box">
 			<h6>Image Source</h6>
 			<table>
 			    <tr>
@@ -56,7 +56,7 @@
     				        <td><input type="button" value="LU" id="LeftUpFillButton" onclick="fillDiagonal('LeftUpFillButton')" /></td>
 	    			        <td><input type="button" value="UP" id="UpFillButton" onclick="fillVertical('UpFillButton')" /></td>
 		    		        <td><input type="button" value="RU" id="RightUpFillButton" onclick="fillDiagonal('RightUpFillButton')" /></td>
-				        </div>		    		        
+				        </div>
 				    </tr>
 				    <tr>
 				        <div>
@@ -67,16 +67,16 @@
 				        </div>
 				    </tr>
 				    <tr>
-				        <div>				    
+				        <div>
 				            <td><input type="button" value="LD" id="LeftDownFillButton" onclick="fillDiagonal('LeftDownFillButton')" /></td>
 				            <td><input type="button" value="DD" id="DownFillButton" onclick="fillVertical('DownFillButton')" /></td>
 				            <td><input type="button" value="RD" id="RightDownFillButton" onclick="fillDiagonal('RightDownFillButton')" /></td>
-				        </div>				            
+				        </div>
 				    </tr>
 				    <tr>
-				        <div>				    
+				        <div>
 				            <input type="button" value="Random Pixels" id="RandomPixelFillButton" onclick="fillRandom()" />
-				        </div>				            
+				        </div>
 				    </tr>
 				</table>
 			</div>

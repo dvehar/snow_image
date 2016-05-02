@@ -2,7 +2,7 @@
   "name": "snow-image",
   "version": "1.0.0",
   "scripts": {
-    "build": "node_modules/rollup/bin/rollup js-es6/main.js > dist.js && node_modules/babel-cli/bin/babel.js dist.js -o dist-final.js"
+    "build": "node_modules/rollup/bin/rollup js-es6/main.js > dist/rollup.js && node_modules/babel-cli/bin/babel.js dist/rollup.js -o dist/app.js && rm -f dist/rollup.js"
   },
   "devDependencies": {
     "babel-cli": "^6.0.0",
