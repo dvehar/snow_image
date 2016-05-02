@@ -143,15 +143,17 @@ function toggleProcessing() {
 
 // unset the border of the colorpicker then set the border of the original color button
 function setOriginalColor(x) {
+	let picker;
+	let colorButton;
 	if (x == 1) {
 		// color 1
-		let picker = COLOR_PICKER_1;
-		let colorButton = ORIGINAL_COLOR_BUTTON_1;
+		picker = COLOR_PICKER_1;
+		colorButton = ORIGINAL_COLOR_BUTTON_1;
 		useOriColor1 = true;
 	} else {
 		// x == 2 (color 2)
-		let picker = COLOR_PICKER_2;
-		let colorButton = ORIGINAL_COLOR_BUTTON_2;
+		picker = COLOR_PICKER_2;
+		colorButton = ORIGINAL_COLOR_BUTTON_2;
 		useOriColor2 = true;
 	}
 
@@ -345,7 +347,7 @@ function computeFrame(doDraw) {
 	updatePixelsPerProcessingInterval();
 	for (let written = 0; written < pixelsPerProcessingInterval; ++written) {
 		// random num to check against whiteChance. will use the 'color1' or the 'color2'. Will then use colorpicker or original colors.
-		use_color1 = whiteChance[processingIntervalBufferIdx / 4] >= Math.random();
+		let use_color1 = whiteChance[processingIntervalBufferIdx / 4] >= Math.random();
 		if (use_color1) {
 			if (useOriColor1) {
 				// use the original image color
