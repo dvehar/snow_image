@@ -89,25 +89,6 @@ function set_processingIntervalBufferIdx(r, c) {
 	processingIntervalBufferIdx = (r + canvas.height * c) * 4;
 }
 
-// if spacebar is pressed in a non-edit text senario then
-// toggleProcessing() and override the spacebar behavior
-document.addEventListener('keyup', function (event) {
-	let doPrevent = false;
-	if (event.keyCode === SPACE_BAR) {
-		let d = event.srcElement || event.target;
-		if (d.tagName.toUpperCase() === 'INPUT' && (d.type.toUpperCase() === 'TEXT' || d.type.toUpperCase() === 'PASSWORD' || d.type.toUpperCase() === 'FILE' || d.type.toUpperCase() === 'EMAIL' || d.type.toUpperCase() === 'SEARCH' || d.type.toUpperCase() === 'DATE') || d.tagName.toUpperCase() === 'TEXTAREA') {
-			doPrevent = d.readOnly || d.disabled;
-		} else {
-			doPrevent = true;
-		}
-	}
-
-	if (doPrevent) {
-		event.preventDefault();
-		toggleProcessing(false);
-	}
-});
-
 function isProcessing() {
 	return processingIntervalId != null;
 }
@@ -123,7 +104,7 @@ function toggleProcessing() {
 		toggleProcessingButton.value = 'start';
 		toggleProcessingButton.style.background = LIGHT_GREEN_HEX;
 	} else {
-		processingIntervalId = setInterval(function () {
+		processingIntervalId = setInterval(() => {
 			computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON);
 		}, processingSpeed);
 		toggleProcessingButton.value = 'stop';
@@ -135,7 +116,7 @@ function toggleProcessing() {
 		displayIntervalId = null;
 	} else if (selectedDirectionFillButton != CENTER_FILL_BUTTON) {
 		// if not drawing and the fill method is not frame fill then turn on the drawing interval
-		displayIntervalId = setInterval(function () {
+		displayIntervalId = setInterval(() => {
 			drawFrame();
 		}, displaySpeed);
 	}
@@ -340,7 +321,7 @@ function computeFrame(doDraw) {
 			clearInterval(displayIntervalId);
 		}
 		displaySpeed -= 50;
-		displayIntervalId = setInterval(function () {
+		displayIntervalId = setInterval(() => {
 			drawFrame();
 		}, displaySpeed);
 	}
@@ -393,7 +374,7 @@ function drawFrame() {
 		if (isProcessing()) {
 			clearInterval(processingIntervalId);
 			processingSpeed -= 50;
-			processingIntervalId = setInterval(function () {
+			processingIntervalId = setInterval(() => {
 				computeFrame(false);
 			}, processingSpeed);
 			displayVsProcess = 0;
@@ -414,7 +395,7 @@ function putImage(imgSource, isWeb) {
 
 	// Can't do anything until the image loads.
 	// Hook its onload event before setting the src property.
-	image.onload = function () {
+	image.onload = () => {
 
 		if (ctx == null) {
 			// Create a canvas
@@ -500,7 +481,7 @@ function putImage(imgSource, isWeb) {
 				}
 	};
 
-	image.onerror = function () {
+	image.onerror = () => {
 		console.error('Failed to load image');
 		alert('I couldn\'t load the image.');
 	};
@@ -545,7 +526,7 @@ function _commonButtonChangingLogic() {
 	// then reset the drawing interval
 	if (displaySpeed != LINE_DISPLAY_SPEED && isDrawing() || !isDrawing() && isProcessing()) {
 		clearInterval(displayIntervalId);
-		displayIntervalId = setInterval(function () {
+		displayIntervalId = setInterval(() => {
 			drawFrame();
 		}, LINE_DISPLAY_SPEED);
 	}
@@ -553,7 +534,7 @@ function _commonButtonChangingLogic() {
 	// if the processing interval speed is not the default for the line filling functions reset it
 	if (isProcessing() && processingSpeed != LINE_PROCESSING_SPEED) {
 		clearInterval(processingIntervalId);
-		processingIntervalId = setInterval(function () {
+		processingIntervalId = setInterval(() => {
 			computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON);
 		}, LINE_PROCESSING_SPEED);
 	}
@@ -569,17 +550,17 @@ function fillDiagonal(dir) {
 		_commonButtonChangingLogic();
 
 		if (dir == 'LeftUpFillButton') {
-			updatePixelsPerProcessingInterval = function () {};
+			updatePixelsPerProcessingInterval = () => {};
 		} else if (dir == 'RightUpFillButton') {
-			updatePixelsPerProcessingInterval = function () {};
+			updatePixelsPerProcessingInterval = () => {};
 		} else if (dir == 'LeftDownFillButton') {
-			updatePixelsPerProcessingInterval = function () {};
+			updatePixelsPerProcessingInterval = () => {};
 		} else {
 			// 'RightDownFillButton'
-			updatePixelsPerProcessingInterval = function () {
+			updatePixelsPerProcessingInterval = () => {
 				pixelsPerProcessingInterval = Math.min(canvas.width - get_curr_col_idx(), get_curr_row_idx() + 1);
 			};
-			pixelStep = function () {
+			pixelStep = () => {
 				var curr_col = get_curr_col_idx();
 				var curr_row = get_curr_row_idx();
 				if (curr_row == canvas.height - 1 && curr_col == canvas.width - 1) {
@@ -606,7 +587,7 @@ function fillHorizontial(dir) {
 		updatePixelsPerProcessingInterval = DO_NOTHING;
 
 		if (dir == 'LeftFillButton') {
-			pixelStep = function () {
+			pixelStep = () => {
 				if (processingIntervalBufferIdx == 0) {
 					processingIntervalBufferIdx = imageData.data.length - 4;
 				} else {
@@ -620,7 +601,7 @@ function fillHorizontial(dir) {
 			};
 		} else {
 			// 'RightFillButton'
-			pixelStep = function () {
+			pixelStep = () => {
 				processingIntervalBufferIdx += canvas.width * 4;
 				if (processingIntervalBufferIdx >= imageData.data.length) {
 					if (processingIntervalBufferIdx == imageData.data.length - 1) {
@@ -645,7 +626,7 @@ function fillVertical(dir) {
 		updatePixelsPerProcessingInterval = DO_NOTHING;
 
 		if (dir == 'UpFillButton') {
-			pixelStep = function () {
+			pixelStep = () => {
 				processingIntervalBufferIdx -= 4;
 				if (processingIntervalBufferIdx < 0) {
 					processingIntervalBufferIdx = imageData.data.length + processingIntervalBufferIdx;
@@ -653,7 +634,7 @@ function fillVertical(dir) {
 			};
 		} else {
 			// 'DownFillButton'
-			pixelStep = function () {
+			pixelStep = () => {
 				processingIntervalBufferIdx = (processingIntervalBufferIdx + 4) % imageData.data.length;
 			};
 		}
@@ -674,7 +655,7 @@ function fillFrame() {
 		if (isProcessing() && processingSpeed != FRAME_PROCESSING_SPEED) {
 			// if the interval is set to the incorrect speed restart it
 			clearInterval(processingIntervalId);
-			processingIntervalId = setInterval(function () {
+			processingIntervalId = setInterval(() => {
 				computeFrame(selectedDirectionFillButton == CENTER_FILL_BUTTON);
 			}, FRAME_PROCESSING_SPEED);
 		}
@@ -685,7 +666,7 @@ function fillFrame() {
 			pixelsPerProcessingInterval = get_pixel_count();
 		}
 
-		pixelStep = function () {
+		pixelStep = () => {
 			processingIntervalBufferIdx = (processingIntervalBufferIdx + 4) % imageData.data.length;
 		};
 
@@ -705,7 +686,7 @@ function fillRandom() {
 			pixelsPerProcessingInterval = Math.max(1, randomInt(get_pixel_count() / 700));
 		}
 
-		pixelStep = function () {
+		pixelStep = () => {
 			set_processingIntervalBufferIdx(randomInt(get_row_count() - 1), randomInt(get_col_count() - 1));
 		};
 	}
@@ -738,7 +719,7 @@ $('#image_loader')[0].onchange = e => {
 		whiteChance = [];
 
 		let reader = new FileReader();
-		reader.onload = function (event) {
+		reader.onload = event => {
 			putImage(event.target.result, false);
 		};
 		reader.readAsDataURL(e.target.files[0]);
@@ -807,6 +788,16 @@ $(document).ready(() => {
 
 	$('#RandomPixelFillButton').click(() => {
 		fillRandom();
+	});
+
+
+	// if spacebar is pressed in a non-edit text senario then
+	// toggleProcessing() and override the spacebar behavior
+	$(document).keydown(e => {
+		if (event.keyCode === SPACE_BAR && e.target === document.body) {
+			event.preventDefault();
+			toggleProcessing(false);
+		}
 	});
 	
 	Jscolor.install();
