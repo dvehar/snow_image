@@ -10,21 +10,19 @@
  */
 
 
-var jscolor = {
-
-
-	dir : '', // location of jscolor directory (leave empty to autodetect)
+let jscolor = {
+	dir : 'assets/', // location of jscolor directory (leave empty to autodetect)
 	bindClass : 'color', // class name
 	binding : true, // automatic binding via <input class="...">
 	preloading : true, // use image preloading?
 
 
-	install : function() {
+	install : () => {
 		jscolor.addEvent(window, 'load', jscolor.init);
 	},
 
 
-	init : function() {
+	init : () => {
 		if(jscolor.binding) {
 			jscolor.bind();
 		}
@@ -34,7 +32,7 @@ var jscolor = {
 	},
 
 
-	getDir : function() {
+	getDir : () => {
 		if(!jscolor.dir) {
 			var detected = jscolor.detectDir();
 			jscolor.dir = detected!==false ? detected : 'jscolor/';
@@ -43,7 +41,7 @@ var jscolor = {
 	},
 
 
-	detectDir : function() {
+	detectDir : () => {
 		var base = location.href;
 
 		var e = document.getElementsByTagName('base');
@@ -66,7 +64,7 @@ var jscolor = {
 	},
 
 
-	bind : function() {
+	bind : () => {
 		var matchClass = new RegExp('(^|\\s)('+jscolor.bindClass+')(\\s*(\\{[^}]*\\})|\\s|$)', 'i');
 		var e = document.getElementsByTagName('input');
 		for(var i=0; i<e.length; i+=1) {
@@ -84,7 +82,7 @@ var jscolor = {
 	},
 
 
-	preload : function() {
+	preload : () => {
 		for(var fn in jscolor.imgRequire) {
 			if(jscolor.imgRequire.hasOwnProperty(fn)) {
 				jscolor.loadImage(fn);
@@ -105,12 +103,12 @@ var jscolor = {
 	imgLoaded : {},
 
 
-	requireImage : function(filename) {
+	requireImage : filename => {
 		jscolor.imgRequire[filename] = true;
 	},
 
 
-	loadImage : function(filename) {
+	loadImage : filename => {
 		if(!jscolor.imgLoaded[filename]) {
 			jscolor.imgLoaded[filename] = new Image();
 			jscolor.imgLoaded[filename].src = jscolor.getDir()+filename;
@@ -118,12 +116,12 @@ var jscolor = {
 	},
 
 
-	fetchElement : function(mixed) {
+	fetchElement : mixed => {
 		return typeof mixed === 'string' ? document.getElementById(mixed) : mixed;
 	},
 
 
-	addEvent : function(el, evnt, func) {
+	addEvent : (el, evnt, func) => {
 		if(el.addEventListener) {
 			el.addEventListener(evnt, func, false);
 		} else if(el.attachEvent) {
@@ -132,7 +130,7 @@ var jscolor = {
 	},
 
 
-	fireEvent : function(el, evnt) {
+	fireEvent : (el, evnt) => {
 		if(!el) {
 			return;
 		}
@@ -149,7 +147,7 @@ var jscolor = {
 	},
 
 
-	getElementPos : function(e) {
+	getElementPos : e => {
 		var e1=e, e2=e;
 		var x=0, y=0;
 		if(e1.offsetParent) {
@@ -166,12 +164,12 @@ var jscolor = {
 	},
 
 
-	getElementSize : function(e) {
+	getElementSize : e => {
 		return [e.offsetWidth, e.offsetHeight];
 	},
 
 
-	getRelMousePos : function(e) {
+	getRelMousePos : e => {
 		var x = 0, y = 0;
 		if (!e) { e = window.event; }
 		if (typeof e.offsetX === 'number') {
@@ -185,7 +183,7 @@ var jscolor = {
 	},
 
 
-	getViewPos : function() {
+	getViewPos : () => {
 		if(typeof window.pageYOffset === 'number') {
 			return [window.pageXOffset, window.pageYOffset];
 		} else if(document.body && (document.body.scrollLeft || document.body.scrollTop)) {
@@ -198,7 +196,7 @@ var jscolor = {
 	},
 
 
-	getViewSize : function() {
+	getViewSize : () => {
 		if(typeof window.innerWidth === 'number') {
 			return [window.innerWidth, window.innerHeight];
 		} else if(document.body && (document.body.clientWidth || document.body.clientHeight)) {
@@ -211,7 +209,7 @@ var jscolor = {
 	},
 
 
-	URI : function(uri) { // See RFC3986
+	URI : uri => { // See RFC3986
 
 		this.scheme = null;
 		this.authority = null;
@@ -219,7 +217,7 @@ var jscolor = {
 		this.query = null;
 		this.fragment = null;
 
-		this.parse = function(uri) {
+		this.parse = uri => {
 			var m = uri.match(/^(([A-Za-z][0-9A-Za-z+.-]*)(:))?((\/\/)([^\/?#]*))?([^?#]*)((\?)([^#]*))?((#)(.*))?/);
 			this.scheme = m[3] ? m[2] : null;
 			this.authority = m[5] ? m[6] : null;
@@ -229,7 +227,7 @@ var jscolor = {
 			return this;
 		};
 
-		this.toString = function() {
+		this.toString = () => {
 			var result = '';
 			if(this.scheme !== null) { result = result + this.scheme + ':'; }
 			if(this.authority !== null) { result = result + '//' + this.authority; }
@@ -239,7 +237,7 @@ var jscolor = {
 			return result;
 		};
 
-		this.toAbsolute = function(base) {
+		this.toAbsolute = base => {
 			var base = new jscolor.URI(base);
 			var r = this;
 			var t = new jscolor.URI;
@@ -323,7 +321,7 @@ var jscolor = {
 	// var myColor = new jscolor.color(myInputElement)
 	//
 
-	color : function(target, prop) {
+	color: function (target, prop) {
 
 
 		this.required = true; // refuse empty values?
@@ -367,14 +365,14 @@ var jscolor = {
 		}
 
 
-		this.hidePicker = function() {
+		this.hidePicker = () => {
 			if(isPickerOwner()) {
 				removePicker();
 			}
 		};
 
 
-		this.showPicker = function() {
+		this.showPicker = () => {
 			if(!isPickerOwner()) {
 				var tp = jscolor.getElementPos(target); // target pos
 				var ts = jscolor.getElementSize(target); // target size
@@ -411,7 +409,7 @@ var jscolor = {
 		};
 
 
-		this.importColor = function() {
+		this.importColor = () => {
 			if(!valueElement) {
 				this.exportColor();
 			} else {
@@ -438,7 +436,7 @@ var jscolor = {
 		};
 
 
-		this.exportColor = function(flags) {
+		this.exportColor = flags => {
 			if(!(flags & leaveValue) && valueElement) {
 				var value = this.toString();
 				if(this.caps) { value = value.toUpperCase(); }
@@ -464,7 +462,7 @@ var jscolor = {
 		};
 
 
-		this.fromHSV = function(h, s, v, flags) { // null = don't change
+		this.fromHSV = (h, s, v, flags) => { // null = don't change
 			if(h !== null) { h = Math.max(0.0, this.minH, Math.min(6.0, this.maxH, h)); }
 			if(s !== null) { s = Math.max(0.0, this.minS, Math.min(1.0, this.maxS, s)); }
 			if(v !== null) { v = Math.max(0.0, this.minV, Math.min(1.0, this.maxV, v)); }
@@ -479,7 +477,7 @@ var jscolor = {
 		};
 
 
-		this.fromRGB = function(r, g, b, flags) { // null = don't change
+		this.fromRGB = (r, g, b, flags) => { // null = don't change
 			if(r !== null) { r = Math.max(0.0, Math.min(1.0, r)); }
 			if(g !== null) { g = Math.max(0.0, Math.min(1.0, g)); }
 			if(b !== null) { b = Math.max(0.0, Math.min(1.0, b)); }
@@ -507,7 +505,7 @@ var jscolor = {
 		};
 
 
-		this.fromString = function(hex, flags) {
+		this.fromString = (hex, flags) => {
 			var m = hex.match(/^\W*([0-9A-F]{3}([0-9A-F]{3})?)\W*$/i);
 			if(!m) {
 				return false;
@@ -532,7 +530,7 @@ var jscolor = {
 		};
 
 
-		this.toString = function() {
+		this.toString = () => {
 			return (
 				(0x100 | Math.round(255*this.rgb[0])).toString(16).substr(1) +
 				(0x100 | Math.round(255*this.rgb[1])).toString(16).substr(1) +
@@ -613,9 +611,9 @@ var jscolor = {
 
 			// controls interaction
 			p.box.onmouseup =
-			p.box.onmouseout = function() { target.focus(); };
-			p.box.onmousedown = function() { abortBlur=true; };
-			p.box.onmousemove = function(e) {
+			p.box.onmouseout = () => { target.focus(); };
+			p.box.onmousedown = () => { abortBlur=true; };
+			p.box.onmousemove = e => {
 				if (holdPad || holdSld) {
 					holdPad && setPad(e);
 					holdSld && setSld(e);
@@ -628,7 +626,7 @@ var jscolor = {
 				}
 			};
 			if('ontouchstart' in window) { // if touch device
-				var handle_touchmove = function(e) {
+				var handle_touchmove = e => {
 					var event={
 						'offsetX': e.touches[0].pageX-touchOffset.X,
 						'offsetY': e.touches[0].pageY-touchOffset.Y
@@ -645,8 +643,8 @@ var jscolor = {
 				p.box.addEventListener('touchmove', handle_touchmove, false)
 			}
 			p.padM.onmouseup =
-			p.padM.onmouseout = function() { if(holdPad) { holdPad=false; jscolor.fireEvent(valueElement,'change'); } };
-			p.padM.onmousedown = function(e) {
+			p.padM.onmouseout = () => { if(holdPad) { holdPad=false; jscolor.fireEvent(valueElement,'change'); } };
+			p.padM.onmousedown = e => {
 				// if the slider is at the bottom, move it up
 				switch(modeID) {
 					case 0: if (THIS.hsv[2] === 0) { THIS.fromHSV(null, null, 1.0); }; break;
@@ -658,7 +656,7 @@ var jscolor = {
 				dispatchImmediateChange();
 			};
 			if('ontouchstart' in window) {
-				p.padM.addEventListener('touchstart', function(e) {
+				p.padM.addEventListener('touchstart', e => {
 					touchOffset={
 						'X': e.target.offsetParent.offsetLeft,
 						'Y': e.target.offsetParent.offsetTop
@@ -670,15 +668,15 @@ var jscolor = {
 				});
 			}
 			p.sldM.onmouseup =
-			p.sldM.onmouseout = function() { if(holdSld) { holdSld=false; jscolor.fireEvent(valueElement,'change'); } };
-			p.sldM.onmousedown = function(e) {
+			p.sldM.onmouseout = () => { if(holdSld) { holdSld=false; jscolor.fireEvent(valueElement,'change'); } };
+			p.sldM.onmousedown = e => {
 				holdPad=false;
 				holdSld=true;
 				setSld(e);
 				dispatchImmediateChange();
 			};
 			if('ontouchstart' in window) {
-				p.sldM.addEventListener('touchstart', function(e) {
+				p.sldM.addEventListener('touchstart', e => {
 					touchOffset={
 						'X': e.target.offsetParent.offsetLeft,
 						'Y': e.target.offsetParent.offsetTop
@@ -948,12 +946,12 @@ var jscolor = {
 			leaveSld = 1<<3;
 
 		// target
-		jscolor.addEvent(target, 'focus', function() {
+		jscolor.addEvent(target, 'focus', () => {
 			if(THIS.pickerOnfocus) { THIS.showPicker(); }
 		});
-		jscolor.addEvent(target, 'blur', function() {
+		jscolor.addEvent(target, 'blur', () => {
 			if(!abortBlur) {
-				window.setTimeout(function(){ abortBlur || blurTarget(); abortBlur=false; }, 0);
+				window.setTimeout(() =>{ abortBlur || blurTarget(); abortBlur=false; }, 0);
 			} else {
 				abortBlur = false;
 			}
@@ -961,7 +959,7 @@ var jscolor = {
 
 		// valueElement
 		if(valueElement) {
-			var updateField = function() {
+			var updateField = () => {
 				THIS.fromString(valueElement.value, leaveValue);
 				dispatchImmediateChange();
 			};
@@ -990,8 +988,7 @@ var jscolor = {
 
 		this.importColor();
 	}
-
 };
 
+export default jscolor;
 
-jscolor.install();

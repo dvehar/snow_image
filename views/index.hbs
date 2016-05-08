@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<link rel="stylesheet" type="text/css" href="preety.css">
+		<link rel="stylesheet" type="text/css" href="css/pretty.css">
 		<title>Snow Image</title>
 	</head>
 
@@ -8,13 +8,14 @@
 		<h2>Snow Image</h2>
 		<p>An image, .png or .jpeg, is converted to grayscale and then each pixel's value is used to probabilistically determine whether the pixel will take on 'color 1' or 'color 2'. These two colors can be be any two colors or take on the original pixel values. The image can be render in its entirety (this is the default behavior) or a few lines at a time in a specified direction. You can upload an image from your computer, specify an image's URL (this might not always work due to your web brower's security features), or use a random image that I have stored on the page.</p>
 		<p>I created this project to do something a little more artsy as well as to get some more experince mainipulating and rendering images. A future project I will work on will be stiching together random photos to form a tiled image that resembles the image given by the user. This project uses (or will use) the following technologies: HTML5 (canvas), jQuery, JavaScript, CSS, REST APIs, Git, and more!</p>
-		<div class="box">			
+		<p>I revisited this project in April/May of 2016 to give it some love (ES6, make it a node app, Heroku CD integration, ...)</p>
+		<div class="box">
 			<h6>Image Source</h6>
 			<table>
 			    <tr>
 			        <td>
 			            <input type="text" id="image_source_textbox" size="30" />
-			            <input type="button" value="Fetch Image From URL" onclick="set_image_source_from_url()" />
+			            <input id="fetchImageFromURLButton" type="button" value="Fetch Image From URL" />
 			        </td>
 			    </tr>
 			    <tr>
@@ -25,76 +26,72 @@
 			    <tr>
 			        <td>
 			            <!-- TODO. Use a api from Flicker, Imgur, Photobucket or something... -->
-			            <input type="button" value="Random Image" onclick="set_random_image_source()" />
+			            <input id="FetchRandomImage" type="button" value="Random Image" />
 			        </td>
 			    </tr>
 			</table>
 			
 			<h6>Image</h6>
-			<input type="button" value="stop" onclick="toggleProcessing()" id="toggleProcessingButton" />
+			<input type="button" value="stop" id="toggleProcessingButton" />
 			<div><canvas id="canvas" width="20" height="20" style="border:solid black;" clear:left;>You'll see this if there's a problem.</canvas></div>
 			<div>
-				Color 1: <input class="color" value="000000" id="colorpicker1" onchange="setColor(1)">
-				Color 2: <input class="color" value="F7FF00" id="colorpicker2" onchange="setColor(2)">
+				Color 1: <input class="color" value="000000" id="colorpicker1" />
+				Color 2: <input class="color" value="F7FF00" id="colorpicker2" />
 			</div>
 
 			<div>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<input type="button" value="Original Color" onclick="setOriginalColor(1);" id="originalcolorbutton1"/>
+				<input type="button" value="Original Color" id="originalcolorbutton1"/>
 			  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<input type="button" value="Original Color" onclick="setOriginalColor(2);" id="originalcolorbutton2" />
+				<input type="button" value="Original Color" id="originalcolorbutton2" />
 			</div>
 			
 			<h6>Effects</h6>
 			<div>
-				<input type="button" value="Invert Image" onclick="invertImage()" />
+				<input id="invertImageButton" type="button" value="Invert Image" />
 				Exchanges the colors
 				
 				<table>
 				    <tr>
 				        <div>
-    				        <td><input type="button" value="LU" id="LeftUpFillButton" onclick="fillDiagonal('LeftUpFillButton')" /></td>
-	    			        <td><input type="button" value="UP" id="UpFillButton" onclick="fillVertical('UpFillButton')" /></td>
-		    		        <td><input type="button" value="RU" id="RightUpFillButton" onclick="fillDiagonal('RightUpFillButton')" /></td>
-				        </div>		    		        
+    				        <td><input type="button" value="LU" id="LeftUpFillButton" /></td>
+	    			        <td><input type="button" value="UP" id="UpFillButton" /></td>
+		    		        <td><input type="button" value="RU" id="RightUpFillButton" /></td>
+				        </div>
 				    </tr>
 				    <tr>
 				        <div>
-				            <td><input type="button" value="LL" id="LeftFillButton" onclick="fillHorizontial('LeftFillButton')" /></td>
-				            <td><input type="button" value="CC" id="FrameFillButton" onclick="fillFrame()" /></td>
-				            <td><input type="button" value="RR" id="RightFillButton" onclick="fillHorizontial('RightFillButton')" /></td>
+				            <td><input type="button" value="LL" id="LeftFillButton" /></td>
+				            <td><input type="button" value="CC" id="FrameFillButton" /></td>
+				            <td><input type="button" value="RR" id="RightFillButton" /></td>
 				            Set the fill direction (Center button fills the whole image)
 				        </div>
 				    </tr>
 				    <tr>
-				        <div>				    
-				            <td><input type="button" value="LD" id="LeftDownFillButton" onclick="fillDiagonal('LeftDownFillButton')" /></td>
-				            <td><input type="button" value="DD" id="DownFillButton" onclick="fillVertical('DownFillButton')" /></td>
-				            <td><input type="button" value="RD" id="RightDownFillButton" onclick="fillDiagonal('RightDownFillButton')" /></td>
-				        </div>				            
+				        <div>
+				            <td><input type="button" value="LD" id="LeftDownFillButton" /></td>
+				            <td><input type="button" value="DD" id="DownFillButton" /></td>
+				            <td><input type="button" value="RD" id="RightDownFillButton" /></td>
+				        </div>
 				    </tr>
 				    <tr>
-				        <div>				    
-				            <input type="button" value="Random Pixels" id="RandomPixelFillButton" onclick="fillRandom()" />
-				        </div>				            
+				        <div>
+				            <input type="button" value="Random Pixels" id="RandomPixelFillButton" />
+				        </div>
 				    </tr>
 				</table>
 			</div>
-			
-			<script src="js/util.js"></script>
-			<script src="js/fill_frame.js"></script>
-			<script src="js/main.js"></script>
-			<script type="text/javascript" src="js/jscolor-1.4.3/jscolor.js"></script>
-			<script>
-			    main();
-			</script>
-			
+
+			<script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+			<script src="dist/app.js"></script>
 		</div>
 		<hr></hr>
 		<a href="https://github.com/dvehar/snow_image/commits/master">Changelog</a>
-		<p><u>To Do</u></p>
+		<p>
+			<u>To Do</u>
+		</p>
 		<ul>
-		    <li>Further refactor code so that button fill logic uses Object Oriented Programming</li>
+		    <li>Further refactor code so that it uses Object Oriented Programming</li>
 		    <li>Fix the HTML so that the fill buttons are laid out cleanly and as intended (Random Pixel should be at the bottom)</li>
 		    <li>Add a save image button</li>
 		    <li>Change the direction fill buttons to have arrows instead of text</li>
@@ -105,6 +102,6 @@
 		    <li>Make the app easier to use (add a user guide, label things, make a video, ???)</li>
 		    <li>Better address Cross Origin Issues</li>
 		    <li>Try to find some API that will allow for pulling random images off of sites like Flickr, Imgur, Photobucket, etc. </li>
-        	</ul>    
+        </ul>
 	</body>
 </html>
