@@ -37,4 +37,4 @@ Icon
 .Trashes
 
 node_modules/
-dist/*.js
+public/dist
