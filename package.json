@@ -1,13 +1,19 @@
 {
   "name": "snow-image",
   "version": "1.0.0",
+  "main": "app.js",
   "scripts": {
-    "postinstall": "mkdir dist && node_modules/rollup/bin/rollup js-es6/main.js > dist/rollup.js && node_modules/babel-cli/bin/babel.js dist/rollup.js -o dist/app.js && rm -f dist/rollup.js",
-    "build": "mkdir dist && node_modules/rollup/bin/rollup js-es6/main.js > dist/rollup.js && node_modules/babel-cli/bin/babel.js dist/rollup.js -o dist/app.js && rm -f dist/rollup.js",
-    "install": "mkdir dist && node_modules/rollup/bin/rollup js-es6/main.js > dist/rollup.js && node_modules/babel-cli/bin/babel.js dist/rollup.js -o dist/app.js && rm -f dist/rollup.js"
+    "start": "node app.js",
+    "clean": "rm -rf public/dist",
+    "postinstall": "rm -rf public/dist; mkdir public/dist && node_modules/rollup/bin/rollup js-es6/main.js > public/dist/rollup.js && node_modules/babel-cli/bin/babel.js public/dist/rollup.js -o public/dist/app.js && rm -f public/dist/rollup.js"
   },
   "engines": {
     "node": "4.1.1"
+  },
+  "dependencies": {
+    "express": "~4.13.1",
+    "express-handlebars": "^3.0.0",
+    "rollup": "^0.26.2"
   },
   "devDependencies": {
     "babel-cli": "^6.0.0",

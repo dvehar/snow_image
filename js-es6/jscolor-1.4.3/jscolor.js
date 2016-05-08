@@ -321,7 +321,7 @@ let jscolor = {
 	// var myColor = new jscolor.color(myInputElement)
 	//
 
-	color : (target, prop) => {
+	color: function (target, prop) {
 
 
 		this.required = true; // refuse empty values?
