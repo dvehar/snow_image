@@ -1,9 +1,8 @@
 import { DO_NOTHING, hexToRgb, myXor, randomInt } from './util';
 import Jscolor from './jscolor-1.4.3/jscolor';
+import Canvas from './canvas';
 
 const SPACE_BAR = 32;
-const WHITE = 255;
-const BLACK = 0;
 const LIGHT_GREEN_HEX = '#33CC33';
 const LIGHT_RED_HEX = '#FF1919';
 const FRAME_DISPLAY_SPEED = 300;
@@ -26,7 +25,6 @@ let local_image_idx = -1; // the idx into LOCAL_IMAGES if it is being used.
 
 let whiteChance = [];
 let canvas = null;
-let ctx = null;
 let ori_data = [];
 let imageData = null;
 
@@ -69,24 +67,24 @@ function get_pixel_count() {
 }
 
 function get_curr_row_idx() {
-	return processingIntervalBufferIdx / 4 % canvas.height;
+	return processingIntervalBufferIdx / 4 % canvas.getHeight();
 }
 
 function get_curr_col_idx() {
-	return processingIntervalBufferIdx / 4 / canvas.height;
+	return processingIntervalBufferIdx / 4 / canvas.getHeight();
 }
 
 function get_row_count() {
-	return canvas.height;
+	return canvas.getHeight();
 }
 
 function get_col_count() {
-	return canvas.width;
+	return canvas.getWidth();
 }
 
 // 0,0 is the first pixel
 function set_processingIntervalBufferIdx(r, c) {
-	processingIntervalBufferIdx = (r + canvas.height * c) * 4;
+	processingIntervalBufferIdx = (r + canvas.getHeight() * c) * 4;
 }
 
 function isProcessing() {
@@ -381,8 +379,13 @@ function drawFrame() {
 		}
 	}
 
-	ctx.putImageData(imageData, 0, 0);
-	if (toDisplay < imageData.data.length) toDisplay = 0;else toDisplay -= imageData.data.length;
+	canvas.putImageData(imageData);
+
+	if (toDisplay < imageData.data.length) {
+		toDisplay = 0;
+	} else {
+		toDisplay -= imageData.data.length;
+	}
 
 	++displayVsProcess;
 }
@@ -396,13 +399,9 @@ function putImage(imgSource, isWeb) {
 	// Can't do anything until the image loads.
 	// Hook its onload event before setting the src property.
 	image.onload = () => {
-
-		if (ctx == null) {
+		if (canvas === null) {
 			// Create a canvas
-			canvas = $('#canvas')[0];
-
-			// Get the drawing context.
-			ctx = canvas.getContext('2d');
+			canvas = new Canvas();
 		}
 
 		// Get the width/height of the image and set
@@ -411,43 +410,36 @@ function putImage(imgSource, isWeb) {
 		let height = image.height;
 
 		toggleProcessingButton.style.width = width; // make the button more obvious
-		canvas.width = width;
-		canvas.height = height;
+		canvas.setWidth(width);
+		canvas.setHeight(height);
 
 		// Draw the image to the canvas.
-		ctx.drawImage(image, 0, 0);
+		canvas.drawImage(image);
 
 		// Get the image data from the canvas, which now contains the contents of the image.
-		imageData = ctx.getImageData(0, 0, width, height);
+		imageData = canvas.getImageData();
 
 		// The actual RGBA values are stored in the data property.
 		let pixelData = imageData.data;
 
 		// Loop through every pixel - this could be slow for huge images.
-		for (let startIdx = 0; startIdx < imageData.data.length; startIdx += 4) {
+		for (let startIdx = 0; startIdx < pixelData.length; startIdx += 4) {
 			// Get the alpha and if it is 0 (no color at all then set the pixel to white)
-			let red;
-			let green;
-			let blue;
 			let alpha = pixelData[startIdx + 3];
-			if (alpha === 0) {
-				red = pixelData[startIdx] = WHITE;
-				green = pixelData[startIdx + 1] = WHITE;
-				blue = pixelData[startIdx + 2] = WHITE;
-			} else {
-				red = pixelData[startIdx];
-				green = pixelData[startIdx + 1];
-				blue = pixelData[startIdx + 2];
-			}
-			pixelData[startIdx + 3] = 255; // opaque
-			ori_data.push(red);
-			ori_data.push(green);
-			ori_data.push(blue);
-			ori_data.push(255);
 
-			// Convert to grayscale.
-			let grayScale = red * 0.2989 + green * 0.5870 + blue * 0.1140;
-			whiteChance.push((255 - grayScale) / 255);
+			if (alpha === canvas.TRANSLUCENT) {
+				canvas.setPixel(imageData, startIdx, canvas.makePixel(WHITE, WHITE, WHITE));
+			}
+			pixelData[startIdx + 3] = canvas.OPAQUE;
+
+			let pixel = canvas.getPixel(imageData, startIdx);
+
+			ori_data.push(pixel.red);
+			ori_data.push(pixel.green);
+			ori_data.push(pixel.blue);
+			ori_data.push(pixel.alpha);
+
+			whiteChance.push((255 - canvas.toGreyscale(pixel) / 255); // calculate the percentage of "white"
 		}
 
 		if (isWeb) {
@@ -458,27 +450,27 @@ function putImage(imgSource, isWeb) {
 		if (isProcessing()) {
 			alert('the processing interval should not be set'); // debugging
 		} else if (isDrawing()) {
-				alert('the display interval should not be set'); // debugging
+			alert('the display interval should not be set'); // debugging
+		} else {
+			if (selectedDirectionFillButton == CENTER_FILL_BUTTON) {
+				processingSpeed = FRAME_PROCESSING_SPEED;
+				displaySpeed = FRAME_DISPLAY_SPEED;
+				pixelsPerProcessingInterval = pixelData.length / 4; // all the pixels
 			} else {
-					if (selectedDirectionFillButton == CENTER_FILL_BUTTON) {
-						processingSpeed = FRAME_PROCESSING_SPEED;
-						displaySpeed = FRAME_DISPLAY_SPEED;
-						pixelsPerProcessingInterval = imageData.data.length / 4; // all the pixels
-					} else {
-							processingSpeed = LINE_PROCESSING_SPEED;
-							displaySpeed = LINE_DISPLAY_SPEED;
-							if (selectedDirectionFillButton == $('#RightFillButton')[0] || selectedDirectionFillButton == $('#LeftFillButton')[0]) {
-								pixelsPerProcessingInterval = canvas.height;
-							} else if (selectedDirectionFillButton == $('#UpFillButton')[0] || selectedDirectionFillButton == $('#DownFillButton')[0]) {
-								pixelsPerProcessingInterval = canvas.width;
-							} else {
-								//} else if (selectedDirectionFillButton == $('#LeftDownFillButton') || selectedDirectionFillButton == $('#RightDownFillButton') ) {
-								// diagonal
-								updatePixelsPerProcessingInterval();
-							}
-						}
-					toggleProcessing();
+				processingSpeed = LINE_PROCESSING_SPEED;
+				displaySpeed = LINE_DISPLAY_SPEED;
+				if (selectedDirectionFillButton == $('#RightFillButton')[0] || selectedDirectionFillButton == $('#LeftFillButton')[0]) {
+					pixelsPerProcessingInterval = canvas.getHeight();
+				} else if (selectedDirectionFillButton == $('#UpFillButton')[0] || selectedDirectionFillButton == $('#DownFillButton')[0]) {
+					pixelsPerProcessingInterval = canvas.getWidth();
+				} else {
+					//} else if (selectedDirectionFillButton == $('#LeftDownFillButton') || selectedDirectionFillButton == $('#RightDownFillButton') ) {
+					// diagonal
+					updatePixelsPerProcessingInterval();
 				}
+			}
+			toggleProcessing();
+		}
 	};
 
 	image.onerror = () => {
@@ -558,16 +550,16 @@ function fillDiagonal(dir) {
 		} else {
 			// 'RightDownFillButton'
 			updatePixelsPerProcessingInterval = () => {
-				pixelsPerProcessingInterval = Math.min(canvas.width - get_curr_col_idx(), get_curr_row_idx() + 1);
+				pixelsPerProcessingInterval = Math.min(canvas.getWidth() - get_curr_col_idx(), get_curr_row_idx() + 1);
 			};
 			pixelStep = () => {
 				var curr_col = get_curr_col_idx();
 				var curr_row = get_curr_row_idx();
-				if (curr_row == canvas.height - 1 && curr_col == canvas.width - 1) {
+				if (curr_row == canvas.getHeight() - 1 && curr_col == canvas.getWidth() - 1) {
 					set_processingIntervalBufferIdx(0, 0);
-				} else if (curr_row == 0 && curr_col < canvas.width - 1) {
+				} else if (curr_row == 0 && curr_col < canvas.getWidth() - 1) {
 					set_processingIntervalBufferIdx(curr_col + 1, 0);
-				} else if (curr_col == canvas.width - 1) {
+				} else if (curr_col == canvas.getWidth() - 1) {
 					set_processingIntervalBufferIdx(curr_col, curr_row + 1);
 				} else {
 					set_processingIntervalBufferIdx(curr_row - 1, curr_col + 1);
@@ -583,7 +575,7 @@ function fillHorizontial(dir) {
 		console.log("using " + dir);
 		_setFillButton(dir);
 		_commonButtonChangingLogic();
-		pixelsPerProcessingInterval = canvas.height;
+		pixelsPerProcessingInterval = canvas.getHeight();
 		updatePixelsPerProcessingInterval = DO_NOTHING;
 
 		if (dir == 'LeftFillButton') {
@@ -591,9 +583,9 @@ function fillHorizontial(dir) {
 				if (processingIntervalBufferIdx == 0) {
 					processingIntervalBufferIdx = imageData.data.length - 4;
 				} else {
-					var tmp = processingIntervalBufferIdx - canvas.width * 4;
+					var tmp = processingIntervalBufferIdx - canvas.getWidth() * 4;
 					if (tmp < 0) {
-						processingIntervalBufferIdx = processingIntervalBufferIdx + canvas.width * 4 * (canvas.height - 1) - 4;
+						processingIntervalBufferIdx = processingIntervalBufferIdx + canvas.getWidth() * 4 * (canvas.getHeight() - 1) - 4;
 					} else {
 						processingIntervalBufferIdx = tmp;
 					}
@@ -602,7 +594,7 @@ function fillHorizontial(dir) {
 		} else {
 			// 'RightFillButton'
 			pixelStep = () => {
-				processingIntervalBufferIdx += canvas.width * 4;
+				processingIntervalBufferIdx += canvas.getWidth() * 4;
 				if (processingIntervalBufferIdx >= imageData.data.length) {
 					if (processingIntervalBufferIdx == imageData.data.length - 1) {
 						// need to go back to 0
@@ -622,7 +614,7 @@ function fillVertical(dir) {
 		console.log("using " + dir);
 		_setFillButton(dir);
 		_commonButtonChangingLogic();
-		pixelsPerProcessingInterval = canvas.width;
+		pixelsPerProcessingInterval = canvas.getWidth();
 		updatePixelsPerProcessingInterval = DO_NOTHING;
 
 		if (dir == 'UpFillButton') {
