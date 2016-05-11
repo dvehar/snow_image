@@ -9,7 +9,10 @@ app.engine('.hbs', exphbs({defaultLayout: 'default', extname: '.hbs'}));
 app.set('view engine', '.hbs');
 
 app.get('/', function (req, res) {
-  res.render('index.hbs');
+  res.render('index.hbs', {
+    'packageVersion': process.env.npm_package_version,
+    'gitCommit': process.env.npm_package_gitHead // TODO(desmondv): figure out how to get the commit version from heroku or how to write a pre-push git step to record it as a heroku env variable
+  });
 });
 
 // catch 404 and forward to error handler
