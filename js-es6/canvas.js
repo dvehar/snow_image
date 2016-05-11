@@ -33,20 +33,20 @@ Canvas.prototype.setWidth = function(width) {
 Canvas.prototype.setHeight = function(height) {
 	this._canvas.height = height;
 };
-Canvas.prototype.getContext = function(...restParams) {
-	return Reflect.apply(this._canvas.getContext, this, ...restParams);
+Canvas.prototype.getColumnCountext = function(contextType, contextAttributes) {
+	return this._canvas.getContext(contextType, contextAttributes);
 };
 Canvas.prototype.drawImage = function(image) {
-	return Reflect.apply(this._canvasCtx.drawImage, this, [ image, 0, 0 ]);
+	return this._canvasCtx.drawImage(image, 0, 0);
 };
 Canvas.prototype.drawImage = function(image) {
-	return Reflect.apply(this._canvasCtx.drawImage, this, [ image, 0, 0 ]);
+	return this._canvasCtx.drawImage(this, image, 0, 0);
 };
 Canvas.prototype.getImageData = function() {
-	return Reflect.apply(this._canvasCtx.getImageData, this, [ 0, 0, this._canvas.width, this._canvas.height ]);
+	return this._canvasCtx.getImageData(0, 0, this._canvas.width, this._canvas.height);
 };
 Canvas.prototype.putImageData = function(image) {
-	return Reflect.apply(this._canvasCtx.putImageData, this, [ image, 0, 0 ]);
+	return this._canvasCtx.putImageData(image, 0, 0);
 };
 Canvas.prototype.makePixel = function(red, green, blue, alpha) {
 	return {
