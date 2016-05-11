@@ -40,7 +40,7 @@ Canvas.prototype.drawImage = function(image) {
 	return this._canvasCtx.drawImage(image, 0, 0);
 };
 Canvas.prototype.drawImage = function(image) {
-	return this._canvasCtx.drawImage(this, image, 0, 0);
+	return this._canvasCtx.drawImage(image, 0, 0);
 };
 Canvas.prototype.getImageData = function() {
 	return this._canvasCtx.getImageData(0, 0, this._canvas.width, this._canvas.height);
