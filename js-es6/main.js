@@ -439,7 +439,7 @@ function putImage(imgSource, isWeb) {
 			ori_data.push(pixel.blue);
 			ori_data.push(pixel.alpha);
 
-			whiteChance.push((255 - canvas.toGreyscale(pixel) / 255); // calculate the percentage of "white"
+			whiteChance.push(255 - canvas.toGreyscale(pixel) / 255); // calculate the percentage of "white"
 		}
 
 		if (isWeb) {
