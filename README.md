@@ -8,3 +8,4 @@ A image, .png or .jpeg, is converted to grayscale and then each pixel's value is
 I created this project to do something a little more artsy as well as to get some more experince mainipulating and rendering images. A future project I will work on will be stiching together random photos to form a tiled image that resembles the image given by the user. The project uses (or will use) the following technologies: HTML5 (canvas), jQuery, JavaScript, CSS, REST APIs, Git, and more!
 
 I revisited this project in April/May of 2016 to give it some love (ES6, make it a node app, Heroku CD integration, ...)
+
