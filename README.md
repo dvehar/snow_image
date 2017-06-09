@@ -9,3 +9,6 @@ I created this project to do something a little more artsy as well as to get som
 
 I revisited this project in April/May of 2016 to give it some love (ES6, make it a node app, Heroku CD integration, ...)
 
+Example of what is possible :)
+![canvas](https://user-images.githubusercontent.com/5605580/26962530-a64ac3de-4c9b-11e7-8f86-8fc18e1957d0.png)
+
