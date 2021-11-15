@@ -12,8 +12,7 @@ I revisited this project in April/May of 2016 to give it some love (ES6, make it
 Examples of what is possible :)<br>
 ![canvas](https://user-images.githubusercontent.com/5605580/26962530-a64ac3de-4c9b-11e7-8f86-8fc18e1957d0.png)
 
-![140665738-ae85ebf3-b7f8-4876-a80f-48ab4e83409b](https://user-images.githubusercontent.com/5605580/141849760-1b63a2d9-bb18-40a6-be00-c301ea82ee57.gif)
-
+![ezgif-2-cb6828299846](https://user-images.githubusercontent.com/5605580/141851276-f9fe6c0d-a634-41aa-8354-e45679611445.gif)
 
 ![snow_image_demo2](https://user-images.githubusercontent.com/5605580/140665741-be994dbc-59a5-4e54-a1ec-ce94a099d6c6.gif)
 
